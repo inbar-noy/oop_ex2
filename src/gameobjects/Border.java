@@ -1,7 +1,8 @@
+package gameobjects;
+
 import danogl.collisions.GameObjectCollection;
 import danogl.gui.rendering.RectangleRenderable;
 import danogl.util.Vector2;
-import gameobjects.Wall;
 
 import java.awt.*;
 
