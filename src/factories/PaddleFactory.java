@@ -12,7 +12,7 @@ import gameobjects.UserPaddle;
 public class PaddleFactory {
     private static final Vector2 PADDLE_DIMENSIONS = new Vector2(100, 15);
     private static final String PADDLE_IMAGE_PATH = "assets/paddle.png";
-    private static final float DIST_FROM_BORDER = 30f;
+    private static final float DIST_FROM_BORDER = 50f;
 
     public static UserPaddle createUserPaddle(ImageReader imageReader,
                                               WindowController windowController,
