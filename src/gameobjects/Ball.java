@@ -16,10 +16,13 @@ public class Ball extends GameObject {
                 Sound collisionSound) {
         super(topLeftCorner, dimensions, renderable);
         this.collisionSound = collisionSound;
+        this.setTag("ball");
     }
 
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
+        if (other.getTag().equals("heart")) return;
+
         super.onCollisionEnter(other, collision);
         Vector2 newVel = getVelocity().flipped(collision.getNormal());
         setVelocity(newVel);
