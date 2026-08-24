@@ -24,11 +24,8 @@ public class BrickerGameManager extends GameManager {
     private static final float BORDER_WIDTH = 10f;
     private static final float WINDOW_WIDTH = 700f;
     private static final float WINDOW_HEIGHT = 500f;
-    private static final float BRICK_HEIGHT = 15f;
-    private static final float BRICK_MARGIN = 3f;
     private static final int DEFAULT_BRICK_COLS = 8;
     private static final int DEFAULT_BRICK_ROWS = 7;
-    private static final int FIRST_BRICK_ROW_HEIGHT = 20;
     private static final int INITIAL_LIVES_COUNT = 3;
     private static final int HUD_LAYER = 1;
     private static final int TEXT_FONT_SIZE = 20;
@@ -53,13 +50,11 @@ public class BrickerGameManager extends GameManager {
     private ImageRenderable heartImage;
     private TextRenderable livesLeftText;
     private ArrayList<GameObject> hearts;
-    private Counter activeBricks;
     private UserInputListener inputListener;
     private ExtraPaddle extraPaddle;
-    private Brick[][] bricks;
     private BrickStrategyFactory strategyFactory;
     private UserPaddle userPaddle;
-    private Sound explosionSound;
+    private BrickGrid brickGrid;
 
     public BrickerGameManager(String windowTitle, Vector2 windowDimension, int brickCols, int brickRows) {
         super(windowTitle, windowDimension);
@@ -80,7 +75,7 @@ public class BrickerGameManager extends GameManager {
         this.windowDimensions = windowController.getWindowDimensions();
         this.inputListener = inputListener;
         this.livesLeft = 0;
-        this.strategyFactory = new BrickStrategyFactory(this);
+
 
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
 
@@ -89,8 +84,9 @@ public class BrickerGameManager extends GameManager {
         respawn();
 
         userPaddle = createUserPaddle(imageReader, inputListener, windowDimensions);
-        bricks = new Brick[brickRows][brickCols];
-        addBricks(imageReader, brickCols, brickRows);
+
+        brickGrid = new BrickGrid(this, imageReader, brickCols, brickRows, WINDOW_WIDTH, BORDER_WIDTH,
+                soundReader);
 
         // Lives text
         livesLeftText = new TextRenderable("");
@@ -108,7 +104,6 @@ public class BrickerGameManager extends GameManager {
             incrementHearts();
         }
 
-        explosionSound = soundReader.readSound("assets/explosion.wav");
     }
 
     private void createBackground(ImageReader imageReader, Vector2 windowDimensions) {
@@ -178,7 +173,7 @@ public class BrickerGameManager extends GameManager {
 
         float ballHeight = ball.getCenter().y();
 
-        if (activeBricks.value() == 0 || inputListener.isKeyPressed(KeyEvent.VK_W)) {
+        if (brickGrid.getActiveBricks() == 0 || inputListener.isKeyPressed(KeyEvent.VK_W)) {
             gameOver("win");
         }
         if (ballHeight > WINDOW_HEIGHT) {
@@ -223,29 +218,6 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
-    // TODO: this feels like it should be made into a class like BrickWall
-    private void addBricks(ImageReader imageReader, int columns, int rows) {
-        ImageRenderable image = imageReader.readImage("assets/brick.png", false);
-        float brickWidth = (WINDOW_WIDTH - 2 * BORDER_WIDTH - BRICK_MARGIN) / columns - BRICK_MARGIN;
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < columns; col++) {
-                Brick brick = new Brick(
-                        row,
-                        col,
-                        new Vector2(BORDER_WIDTH + (BRICK_MARGIN + brickWidth) * col + BRICK_MARGIN,
-                                (BRICK_HEIGHT + BRICK_MARGIN) * row + FIRST_BRICK_ROW_HEIGHT),
-                        new Vector2(brickWidth, BRICK_HEIGHT),
-                        image,
-                        strategyFactory.selectBrickStrategy(),
-                        explosionSound);
-                gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
-                bricks[row][col] = brick;
-            }
-        }
-        activeBricks = new Counter(rows * columns);
-    }
-
-
     public void startFallingHeart(Vector2 location) {
         FallingHeart heart = new FallingHeart(location,
                 new Vector2(HEART_SIZE, HEART_SIZE),
@@ -261,36 +233,17 @@ public class BrickerGameManager extends GameManager {
         gameObjects().removeGameObject(heart);
     }
 
-    private void blowBrick(int row, int col) {
-        Brick targetBrick = bricks[row][col];
-        if (targetBrick != null) {
-            targetBrick.pseudoCollision();
-        }
-    }
 
     public void removeBrick(GameObject obj, boolean isExplosive, int row, int col) {
-        if (bricks[row][col] == null) {
-            return;
-        }
+        this.brickGrid.removeBrick(obj, isExplosive, row, col);
+    }
 
+    public void removeStaticObj(GameObject obj) {
         gameObjects().removeGameObject(obj, Layer.STATIC_OBJECTS);
-        activeBricks.decrement();
-        bricks[row][col] = null;
-        if (isExplosive) {
-            explosionSound.play();
-            if (row > 0) {
-                blowBrick(row - 1, col);
-            }
-            if (row < brickRows - 1) {
-                blowBrick(row + 1, col);
-            }
-            if (col > 0) {
-                blowBrick(row, col - 1);
-            }
-            if (col < brickCols - 1) {
-                blowBrick(row, col + 1);
-            }
-        }
+    }
+
+    public void addStaticObj(GameObject obj) {
+        gameObjects().addGameObject(obj, Layer.STATIC_OBJECTS);
     }
 
     public static void main(String[] args) {
