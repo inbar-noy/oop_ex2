@@ -39,6 +39,7 @@ public class BrickerGameManager extends GameManager {
     private static final int HEART_Y = 30;
     private static final int HEART_OFFSET = 25;
     private static final int MAX_LIFE_COUNT = 4;
+    private static final int HEART_FALL_SPEED = 100;
 
     private final int brickCols;
     private final int brickRows;
@@ -252,7 +253,7 @@ public class BrickerGameManager extends GameManager {
                 this,
                 userPaddle
                 );
-        heart.setVelocity(new Vector2(0, 100));
+        heart.setVelocity(new Vector2(0, HEART_FALL_SPEED));
         gameObjects().addGameObject(heart);
     }
 
