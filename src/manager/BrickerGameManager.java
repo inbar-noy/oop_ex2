@@ -165,6 +165,7 @@ public class BrickerGameManager extends GameManager {
         this.extraPaddle = extra;
         gameObjects().addGameObject(extra);
     }
+
     private boolean isGameOver() {
         return this.livesLeft == 0;
     }
