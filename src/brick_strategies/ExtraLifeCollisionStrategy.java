@@ -14,7 +14,7 @@ public class ExtraLifeCollisionStrategy implements CollisionStrategy {
 
     public void onCollision(Brick thisObj, GameObject otherObj) {
         Vector2 location = thisObj.getCenterCoordinates();
-        manager.removeBrick(thisObj);
+        manager.removeBrick(thisObj, false, thisObj.getRow(), thisObj.getCol());
         manager.startFallingHeart(location);
     }
 }

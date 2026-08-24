@@ -12,6 +12,6 @@ public class BasicCollisionStrategy implements CollisionStrategy {
     }
 
     public void onCollision(Brick thisObj, GameObject otherObj) {
-        manager.removeBrick(thisObj);
+        manager.removeBrick(thisObj, false, thisObj.getRow(), thisObj.getCol());
     }
 }

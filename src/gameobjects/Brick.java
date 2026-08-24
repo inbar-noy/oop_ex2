@@ -10,10 +10,24 @@ public class Brick extends GameObject {
     private final CollisionStrategy collisionStrategy;
     private final Vector2 centerCoordinates;
 
-    public Brick(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable, CollisionStrategy collisionStrategy) {
+
+    private final int row;
+    private final int col;
+
+    public Brick(int row, int col, Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable, CollisionStrategy collisionStrategy) {
         super(topLeftCorner, dimensions, renderable);
         this.collisionStrategy = collisionStrategy;
         this.centerCoordinates = topLeftCorner.add(dimensions.mult(0.5f));
+        this.row = row;
+        this.col = col;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
     }
 
     @Override
@@ -24,5 +38,9 @@ public class Brick extends GameObject {
 
     public Vector2 getCenterCoordinates() {
         return this.centerCoordinates;
+    }
+
+    public void pseudoCollision() {
+        this.collisionStrategy.onCollision(this, null);
     }
 }

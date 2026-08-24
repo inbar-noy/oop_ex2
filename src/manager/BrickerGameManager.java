@@ -3,6 +3,8 @@ package manager;
 import brick_strategies.BasicCollisionStrategy;
 import brick_strategies.ExtraPaddleStrategy;
 import brick_strategies.PuckStrategy;
+import brick_strategies.ExplosiveCollisionStrategy;
+import brick_strategies.ExtraLifeCollisionStrategy;
 import danogl.GameManager;
 import danogl.GameObject;
 import danogl.collisions.Layer;
@@ -56,6 +58,7 @@ public class BrickerGameManager extends GameManager {
     private Counter activeBricks;
     private UserInputListener inputListener;
     private ExtraPaddle extraPaddle;
+    private Brick[][] bricks;
 
     public BrickerGameManager(String windowTitle, Vector2 windowDimension, int brickCols, int brickRows) {
         super(windowTitle, windowDimension);
@@ -95,6 +98,7 @@ public class BrickerGameManager extends GameManager {
 //        AIPaddle aiPaddle = createAIPaddle(imageReader, windowDimensions, mainBall);
 
         // Bricks
+        bricks = new Brick[brickRows][brickCols];
         addBricks(imageReader, brickCols, brickRows);
 
         // Lives text
@@ -204,8 +208,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
-
-    private void incrementHearts() {
+    public void incrementHearts() {
         livesLeft += 1;
         GameObject heart = new GameObject(
                 new Vector2(HEART_X + livesLeft * HEART_OFFSET, WINDOW_HEIGHT - HEART_Y),
@@ -243,6 +246,8 @@ public class BrickerGameManager extends GameManager {
             for (int col = 0; col < columns; col++) {
 
                 Brick brick = new Brick(
+                        row,
+                        col,
                         new Vector2(BORDER_WIDTH + (BRICK_MARGIN + brickWidth) * col + BRICK_MARGIN,
                                 (BRICK_HEIGHT + BRICK_MARGIN) * row + FIRST_BRICK_ROW_HEIGHT),
                         new Vector2(brickWidth, BRICK_HEIGHT),
@@ -252,15 +257,29 @@ public class BrickerGameManager extends GameManager {
                         new PuckStrategy(this));
 //                        new ExtraPaddleStrategy(this));
                 gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
+                bricks[row][col] = brick;
             }
         }
         activeBricks = new Counter(rows * columns);
     }
 
-    public void removeBrick(GameObject obj) {
+    public void removeBrick(GameObject obj, boolean isExplosive, int row, int col) {
         activeBricks.decrement();
         gameObjects().removeGameObject(obj, Layer.STATIC_OBJECTS);
-
+        if (isExplosive) {
+            bricks[row][col] = null;
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++) {
+                    int targetRow = row + i;
+                    int targetCol = col + j;
+                    if (targetRow >= 0 && targetRow < brickRows && targetCol >= 0 && targetCol < brickCols) {
+                        if (bricks[targetRow][targetCol] != null) {
+                            bricks[targetRow][targetCol].pseudoCollision();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {
