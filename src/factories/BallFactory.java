@@ -1,5 +1,6 @@
 package factories;
 
+import danogl.collisions.GameObjectCollection;
 import danogl.gui.ImageReader;
 import danogl.gui.Sound;
 import danogl.gui.SoundReader;
@@ -39,11 +40,14 @@ public class BallFactory {
 
     public static Puck createPuck(ImageReader imageReader,
                                   SoundReader soundReader,
-                                  Vector2 centerPosition) {
+                                  Vector2 centerPosition,
+                                  GameObjectCollection gameObjects,
+                                  float windowHeight) {
         Renderable puckImage = imageReader.readImage(PUCK_IMAGE_PATH, true);
         Sound collisionSound = soundReader.readSound(COLLISION_SOUND_PATH);
 
-        Puck puck = new Puck(Vector2.ZERO, PUCK_DIMENSIONS, puckImage, collisionSound);
+        Puck puck = new Puck(Vector2.ZERO, PUCK_DIMENSIONS, puckImage, collisionSound,
+                gameObjects, windowHeight);
         puck.setCenter(centerPosition);
 
         double angle = random.nextDouble() * Math.PI;

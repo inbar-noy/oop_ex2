@@ -1,6 +1,7 @@
 package factories;
 
 import danogl.GameObject;
+import danogl.collisions.GameObjectCollection;
 import danogl.gui.ImageReader;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.Renderable;
@@ -30,12 +31,13 @@ public class PaddleFactory {
     public static ExtraPaddle createExtraPaddle(ImageReader imageReader,
                                                 UserInputListener inputListener,
                                                 Vector2 windowDimensions,
-                                                float borderWidth) {
+                                                float borderWidth,
+                                                GameObjectCollection gameObjects) {
         Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
         float maxX = getMaxX(windowDimensions.x(), borderWidth);
 
         ExtraPaddle extra = new ExtraPaddle(Vector2.ZERO, PADDLE_DIMENSIONS, paddleImage,
-                borderWidth, maxX, inputListener);
+                borderWidth, maxX, inputListener, gameObjects);
         extra.setCenter(windowDimensions.mult(0.5f));
         return extra;
     }

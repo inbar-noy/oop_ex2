@@ -12,21 +12,25 @@ public class Border {
 
     private final Vector2 topLeftCorner = Vector2.ZERO;
     private final Vector2 topRightCorner;
-    private final Vector2 WallDims;
+    private final Vector2 VerticalWallDims;
+    private final Vector2 HorizontalWallDims;
 
     private final RectangleRenderable border = new RectangleRenderable(BORDER_COLOR);
 
     public Border(Vector2 dimensions) {
         topRightCorner = new Vector2(dimensions.x() - BORDER_WIDTH, 0);
-        WallDims = new Vector2(BORDER_WIDTH, dimensions.y());
+        VerticalWallDims = new Vector2(BORDER_WIDTH, dimensions.y());
+        HorizontalWallDims = new Vector2(dimensions.x(), BORDER_WIDTH);
     }
 
     public Border buildBorder(GameObjectCollection gameObjects) {
-        Wall leftBorder = new Wall(topLeftCorner, WallDims, border);
-        Wall rightBorder = new Wall(topRightCorner, WallDims, border);
+        Wall leftBorder = new Wall(topLeftCorner, VerticalWallDims, border);
+        Wall rightBorder = new Wall(topRightCorner, VerticalWallDims, border);
+        Wall ceiling = new Wall(topLeftCorner, HorizontalWallDims, border);
 
         gameObjects.addGameObject(leftBorder);
         gameObjects.addGameObject(rightBorder);
+        gameObjects.addGameObject(ceiling);
 
         return this;
     }

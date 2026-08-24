@@ -29,7 +29,7 @@ public class BrickerGameManager extends GameManager {
     private static final float BRICK_HEIGHT = 15f;
     private static final float BRICK_MARGIN = 3f;
     private static final int DEFAULT_BRICK_COLS = 8;
-    private static final int DEFAULT_BRICK_ROWS = 7;
+    private static final int DEFAULT_BRICK_ROWS = 1;
     private static final int FIRST_BRICK_ROW_HEIGHT = 20;
     private static final int INITIAL_LIVES_COUNT = 3;
     private static final int HUD_LAYER = 1;
@@ -150,8 +150,8 @@ public class BrickerGameManager extends GameManager {
     }
 
     public void createPucks(Vector2 center) {
-        Puck puck1 = BallFactory.createPuck(imageReader, soundReader, center);
-        Puck puck2 = BallFactory.createPuck(imageReader, soundReader, center);
+        Puck puck1 = BallFactory.createPuck(imageReader, soundReader, center, gameObjects(), WINDOW_HEIGHT);
+        Puck puck2 = BallFactory.createPuck(imageReader, soundReader, center, gameObjects(), WINDOW_HEIGHT);
         gameObjects().addGameObject(puck1);
         gameObjects().addGameObject(puck2);
     }
@@ -160,7 +160,8 @@ public class BrickerGameManager extends GameManager {
         if (this.extraPaddle != null) {
             gameObjects().removeGameObject(this.extraPaddle);
         }
-        ExtraPaddle extra = PaddleFactory.createExtraPaddle(imageReader, inputListener, windowDimensions, BORDER_WIDTH);
+        ExtraPaddle extra = PaddleFactory.createExtraPaddle(imageReader, inputListener,
+                windowDimensions, BORDER_WIDTH, gameObjects());
         this.extraPaddle = extra;
         gameObjects().addGameObject(extra);
     }
@@ -188,24 +189,8 @@ public class BrickerGameManager extends GameManager {
     public void update(float timeDelta) {
         super.update(timeDelta);
 
-        for (GameObject obj : gameObjects()) {
-            // remove pucks which fall beyond the screen
-            float objY = obj.getCenter().y();
-            if (obj instanceof Puck && (objY > WINDOW_HEIGHT || objY < 0)) {
-                gameObjects().removeGameObject(obj);
-            }
-            // if an extra paddle had been hit 4 times remove
-            if (obj instanceof ExtraPaddle) {
-                if (((ExtraPaddle) obj).hitQuota()) {
-                    gameObjects().removeGameObject(obj);
-                    this.extraPaddle = null;
-                }
-            }
-        }
-
         float ballHeight = ball.getCenter().y();
 
-        // TODO: handle the case where the ball goes through the ceiling, is it a win?
         if (activeBricks.value() == 0 || inputListener.isKeyPressed(KeyEvent.VK_W)) {
             gameOver("win");
         }
