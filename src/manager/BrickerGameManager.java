@@ -61,6 +61,7 @@ public class BrickerGameManager extends GameManager {
     private ExtraPaddle extraPaddle;
     private Brick[][] bricks;
     private BrickStrategyFactory strategyFactory;
+    private UserPaddle userPaddle;
 
     public BrickerGameManager(String windowTitle, Vector2 windowDimension, int brickCols, int brickRows) {
         super(windowTitle, windowDimension);
@@ -95,7 +96,7 @@ public class BrickerGameManager extends GameManager {
         respawn();
 
         // User paddle
-        UserPaddle userPaddle = createUserPaddle(imageReader, inputListener, windowDimensions);
+        userPaddle = createUserPaddle(imageReader, inputListener, windowDimensions);
 
         // AI paddle
 //        AIPaddle aiPaddle = createAIPaddle(imageReader, windowDimensions, mainBall);
@@ -194,6 +195,15 @@ public class BrickerGameManager extends GameManager {
 
     @Override
     public void update(float timeDelta) {
+//        System.out.println(activeBricks.value());
+//        for (int i = 0; i < brickRows; i++) {
+//            for (int j = 0; j < brickCols; j++) {
+//                System.out.print(bricks[i][j] == null ? "1" : "0");
+//            }
+//
+//            System.out.println("");
+//
+//        }
         super.update(timeDelta);
 
         float ballHeight = ball.getCenter().y();
@@ -270,7 +280,9 @@ public class BrickerGameManager extends GameManager {
         FallingHeart heart = new FallingHeart(location,
                 new Vector2(HEART_SIZE, HEART_SIZE),
                 heartImage,
-                this);
+                this,
+                userPaddle
+                );
         heart.setVelocity(new Vector2(0, 100));
         gameObjects().addGameObject(heart);
     }
@@ -279,24 +291,33 @@ public class BrickerGameManager extends GameManager {
         gameObjects().removeGameObject(heart);
     }
 
+    private void blowBrick(int row, int col) {
+        Brick targetBrick = bricks[row][col];
+        if (targetBrick != null) {
+            targetBrick.pseudoCollision();
+        }
+    }
+
     public void removeBrick(GameObject obj, boolean isExplosive, int row, int col) {
-        activeBricks.decrement();
+        if (bricks[row][col] == null) {
+            return;
+        }
+
         gameObjects().removeGameObject(obj, Layer.STATIC_OBJECTS);
+        activeBricks.decrement();
+        bricks[row][col] = null;
         if (isExplosive) {
-            bricks[row][col] = null;
-            // TODO: remove diagonals
-            for (int i = -1; i < 2; i++) {
-                for (int j = -1; j < 2; j++) {
-                    int targetRow = row + i;
-                    int targetCol = col + j;
-                    if (targetRow >= 0 && targetRow < brickRows && targetCol >= 0 && targetCol < brickCols) {
-                        if (bricks[targetRow][targetCol] != null) {
-                            activeBricks.decrement();
-                            gameObjects().removeGameObject(obj, Layer.STATIC_OBJECTS);
-                            bricks[targetRow][targetCol].pseudoCollision();
-                        }
-                    }
-                }
+            if (row > 0) {
+                blowBrick(row - 1, col);
+            }
+            if (row < brickRows - 1) {
+                blowBrick(row + 1, col);
+            }
+            if (col > 0) {
+                blowBrick(row, col - 1);
+            }
+            if (col < brickCols - 1) {
+                blowBrick(row, col + 1);
             }
         }
     }
