@@ -9,15 +9,12 @@ import manager.BrickerGameManager;
 public class ExplosiveCollisionStrategy implements CollisionStrategy {
 
     private final BrickerGameManager manager;
-    private final Sound explosionSound;
 
-    public ExplosiveCollisionStrategy(BrickerGameManager manager, SoundReader soundReader) {
-        this.explosionSound = soundReader.readSound("assets/explosion.wav");
+    public ExplosiveCollisionStrategy(BrickerGameManager manager) {
         this.manager = manager;
     }
 
     public void onCollision(Brick thisObj, GameObject otherObj) {
         manager.removeBrick(thisObj, true, thisObj.getRow(), thisObj.getCol());
-        this.explosionSound.play();
     }
 }
