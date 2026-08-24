@@ -3,10 +3,10 @@ package factories;
 import danogl.GameObject;
 import danogl.gui.ImageReader;
 import danogl.gui.UserInputListener;
-import danogl.gui.WindowController;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 import gameobjects.AIPaddle;
+import gameobjects.ExtraPaddle;
 import gameobjects.UserPaddle;
 
 public class PaddleFactory {
@@ -14,39 +14,49 @@ public class PaddleFactory {
     private static final String PADDLE_IMAGE_PATH = "assets/paddle.png";
     private static final float DIST_FROM_BORDER = 50f;
 
+
     public static UserPaddle createUserPaddle(ImageReader imageReader,
-                                              WindowController windowController,
                                               UserInputListener inputListener,
+                                              Vector2 windowDimensions,
                                               float borderWidth) {
         Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
-        Vector2 windowDimensions = windowController.getWindowDimensions();
+        Vector2 topLeft = getInitialTopLeft(windowDimensions, windowDimensions.y() - DIST_FROM_BORDER);
+        float maxX = getMaxX(windowDimensions.x(), borderWidth);
 
-        float x = (windowDimensions.x() - PADDLE_DIMENSIONS.x()) / 2f;
-        float y = windowDimensions.y() - DIST_FROM_BORDER;
-        Vector2 topLeftCorner = new Vector2(x, y);
-
-        float minX = borderWidth;
-        float maxX = windowDimensions.x() - borderWidth - PADDLE_DIMENSIONS.x();
-
-        return new UserPaddle(topLeftCorner, PADDLE_DIMENSIONS, paddleImage,
-                minX, maxX, inputListener);
+        return new UserPaddle(topLeft, PADDLE_DIMENSIONS, paddleImage,
+                borderWidth, maxX, inputListener);
     }
 
+    public static ExtraPaddle createExtraPaddle(ImageReader imageReader,
+                                                UserInputListener inputListener,
+                                                Vector2 windowDimensions,
+                                                float borderWidth) {
+        Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
+        float maxX = getMaxX(windowDimensions.x(), borderWidth);
+
+        ExtraPaddle extra = new ExtraPaddle(Vector2.ZERO, PADDLE_DIMENSIONS, paddleImage,
+                borderWidth, maxX, inputListener);
+        extra.setCenter(windowDimensions.mult(0.5f));
+        return extra;
+    }
     public static AIPaddle createAIPaddle(ImageReader imageReader,
-                                          WindowController windowController,
+                                          Vector2 windowDimensions,
                                           float borderWidth,
                                           GameObject objectToFollow) {
         Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
-        Vector2 windowDimensions = windowController.getWindowDimensions();
+        Vector2 topLeft = getInitialTopLeft(windowDimensions, DIST_FROM_BORDER);
+        float maxX = getMaxX(windowDimensions.x(), borderWidth);
 
-        float x = (windowDimensions.x() - PADDLE_DIMENSIONS.x()) / 2f;
-        float y = DIST_FROM_BORDER;
-        Vector2 topLeftCorner = new Vector2(x, y);
+        return new AIPaddle(topLeft, PADDLE_DIMENSIONS, paddleImage,
+                borderWidth, maxX, objectToFollow);
+    }
 
-        float minX = borderWidth;
-        float maxX = windowDimensions.x() - borderWidth - PADDLE_DIMENSIONS.x();
+    private static Vector2 getInitialTopLeft(Vector2 windowDimensions, float yPos) {
+        float xPos = (windowDimensions.x() - PADDLE_DIMENSIONS.x()) / 2f;
+        return new Vector2(xPos, yPos);
+    }
 
-        return new AIPaddle(topLeftCorner, PADDLE_DIMENSIONS, paddleImage,
-                minX, maxX, objectToFollow);
+    private static float getMaxX(float windowWidth, float borderWidth) {
+        return windowWidth - borderWidth - PADDLE_DIMENSIONS.x();
     }
 }

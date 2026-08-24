@@ -1,6 +1,8 @@
 package manager;
 
 import brick_strategies.BasicCollisionStrategy;
+import brick_strategies.ExtraPaddleStrategy;
+import brick_strategies.PuckStrategy;
 import danogl.GameManager;
 import danogl.GameObject;
 import danogl.collisions.Layer;
@@ -47,11 +49,13 @@ public class BrickerGameManager extends GameManager {
     private int livesLeft;
     private ImageReader imageReader;
     private SoundReader soundReader;
+    private Vector2 windowDimensions;
     private ImageRenderable heartImage;
     private TextRenderable livesLeftText;
     private ArrayList<GameObject> hearts;
     private Counter activeBricks;
     private UserInputListener inputListener;
+    private ExtraPaddle extraPaddle;
 
     public BrickerGameManager(String windowTitle, Vector2 windowDimension, int brickCols, int brickRows) {
         super(windowTitle, windowDimension);
@@ -69,12 +73,11 @@ public class BrickerGameManager extends GameManager {
         this.imageReader = imageReader;
         this.soundReader = soundReader;
         this.windowController = windowController;
+        this.windowDimensions = windowController.getWindowDimensions();
         this.inputListener = inputListener;
         this.livesLeft = 0;
 
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
-
-        Vector2 windowDimensions = windowController.getWindowDimensions();
 
         // Background
         Background background = createBackground(imageReader, windowDimensions);
@@ -86,10 +89,10 @@ public class BrickerGameManager extends GameManager {
         respawn();
 
         // User paddle
-        UserPaddle userPaddle = createUserPaddle(imageReader, windowController, inputListener);
+        UserPaddle userPaddle = createUserPaddle(imageReader, inputListener, windowDimensions);
 
         // AI paddle
-//        AIPaddle aiPaddle = createAIPaddle(imageReader, windowController, mainBall);
+//        AIPaddle aiPaddle = createAIPaddle(imageReader, windowDimensions, mainBall);
 
         // Bricks
         addBricks(imageReader, brickCols, brickRows);
@@ -124,26 +127,43 @@ public class BrickerGameManager extends GameManager {
         return border;
     }
 
-    private Ball createBall(ImageReader imageReader, SoundReader soundReader, WindowController windowController) {
-        Ball mainBall = BallFactory.createMainBall(imageReader, soundReader, windowController);
+    private Ball createBall(ImageReader imageReader, SoundReader soundReader, Vector2 windowDimensions) {
+        Ball mainBall = BallFactory.createMainBall(imageReader, soundReader, windowDimensions);
         gameObjects().addGameObject(mainBall);
         return mainBall;
     }
 
-    private UserPaddle createUserPaddle(ImageReader imageReader, WindowController windowController, UserInputListener inputListener) {
+    private UserPaddle createUserPaddle(
+            ImageReader imageReader, UserInputListener inputListener, Vector2 windowDimensions) {
         UserPaddle userPaddle = PaddleFactory.createUserPaddle(
-                imageReader, windowController, inputListener, BORDER_WIDTH);
+                imageReader, inputListener, windowDimensions, BORDER_WIDTH);
         gameObjects().addGameObject(userPaddle);
         return userPaddle;
     }
 
-    private AIPaddle createAIPaddle(ImageReader imageReader, WindowController windowController, GameObject objectToFollow) {
+    private AIPaddle createAIPaddle(
+            ImageReader imageReader, Vector2 windowDimensions, GameObject objectToFollow) {
         AIPaddle aiPaddle = PaddleFactory.createAIPaddle(
-                imageReader, windowController, BORDER_WIDTH, objectToFollow);
+                imageReader, windowDimensions, BORDER_WIDTH, objectToFollow);
         gameObjects().addGameObject(aiPaddle);
         return aiPaddle;
     }
 
+    public void createPucks(Vector2 center) {
+        Puck puck1 = BallFactory.createPuck(imageReader, soundReader, center);
+        Puck puck2 = BallFactory.createPuck(imageReader, soundReader, center);
+        gameObjects().addGameObject(puck1);
+        gameObjects().addGameObject(puck2);
+    }
+
+    public void createExtraPaddle(Vector2 center) {
+        if (this.extraPaddle != null) {
+            gameObjects().removeGameObject(this.extraPaddle);
+        }
+        ExtraPaddle extra = PaddleFactory.createExtraPaddle(imageReader, inputListener, windowDimensions, BORDER_WIDTH);
+        this.extraPaddle = extra;
+        gameObjects().addGameObject(extra);
+    }
     private boolean isGameOver() {
         return this.livesLeft == 0;
     }
@@ -152,7 +172,7 @@ public class BrickerGameManager extends GameManager {
         if (this.ball != null) {
             gameObjects().removeGameObject(this.ball);
         }
-        this.ball = createBall(imageReader, soundReader, windowController);;
+        this.ball = createBall(imageReader, soundReader, windowDimensions);;
     }
 
     private void gameOver(String state) {
@@ -167,7 +187,25 @@ public class BrickerGameManager extends GameManager {
     @Override
     public void update(float timeDelta) {
         super.update(timeDelta);
+
+        for (GameObject obj : gameObjects()) {
+            // remove pucks which fall beyond the screen
+            float objY = obj.getCenter().y();
+            if (obj instanceof Puck && (objY > WINDOW_HEIGHT || objY < 0)) {
+                gameObjects().removeGameObject(obj);
+            }
+            // if an extra paddle had been hit 4 times remove
+            if (obj instanceof ExtraPaddle) {
+                if (((ExtraPaddle) obj).hitQuota()) {
+                    gameObjects().removeGameObject(obj);
+                    this.extraPaddle = null;
+                }
+            }
+        }
+
         float ballHeight = ball.getCenter().y();
+
+        // TODO: handle the case where the ball goes through the ceiling, is it a win?
         if (activeBricks.value() == 0 || inputListener.isKeyPressed(KeyEvent.VK_W)) {
             gameOver("win");
         }
@@ -212,6 +250,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // TODO: this feels like it should be made into a class like BrickWall
     private void addBricks(ImageReader imageReader, int columns, int rows) {
         ImageRenderable image = imageReader.readImage("assets/brick.png", false);
         float brickWidth = (WINDOW_WIDTH - 2 * BORDER_WIDTH - BRICK_MARGIN) / columns - BRICK_MARGIN;
@@ -223,7 +262,10 @@ public class BrickerGameManager extends GameManager {
                                 (BRICK_HEIGHT + BRICK_MARGIN) * row + FIRST_BRICK_ROW_HEIGHT),
                         new Vector2(brickWidth, BRICK_HEIGHT),
                         image,
-                        new BasicCollisionStrategy(this));
+// TODO: adapt for different strategies
+//                        new BasicCollisionStrategy(this));
+//                        new PuckStrategy(this));
+                        new ExtraPaddleStrategy(this));
                 gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
             }
         }
