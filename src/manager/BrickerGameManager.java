@@ -15,6 +15,7 @@ import danogl.gui.rendering.TextRenderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
 import factories.BallFactory;
+import factories.BrickStrategyFactory;
 import factories.PaddleFactory;
 import gameobjects.*;
 
@@ -59,6 +60,7 @@ public class BrickerGameManager extends GameManager {
     private UserInputListener inputListener;
     private ExtraPaddle extraPaddle;
     private Brick[][] bricks;
+    private BrickStrategyFactory strategyFactory;
 
     public BrickerGameManager(String windowTitle, Vector2 windowDimension, int brickCols, int brickRows) {
         super(windowTitle, windowDimension);
@@ -79,6 +81,7 @@ public class BrickerGameManager extends GameManager {
         this.windowDimensions = windowController.getWindowDimensions();
         this.inputListener = inputListener;
         this.livesLeft = 0;
+        this.strategyFactory = new BrickStrategyFactory(this, soundReader);
 
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
 
@@ -160,7 +163,7 @@ public class BrickerGameManager extends GameManager {
         gameObjects().addGameObject(puck2);
     }
 
-    public void createExtraPaddle(Vector2 center) {
+    public void createExtraPaddle() {
         if (this.extraPaddle != null) {
             gameObjects().removeGameObject(this.extraPaddle);
         }
@@ -177,7 +180,7 @@ public class BrickerGameManager extends GameManager {
         if (this.ball != null) {
             gameObjects().removeGameObject(this.ball);
         }
-        this.ball = createBall(imageReader, soundReader, windowDimensions);;
+        this.ball = createBall(imageReader, soundReader, windowDimensions);
     }
 
     private void gameOver(String state) {
@@ -254,12 +257,7 @@ public class BrickerGameManager extends GameManager {
                                 (BRICK_HEIGHT + BRICK_MARGIN) * row + FIRST_BRICK_ROW_HEIGHT),
                         new Vector2(brickWidth, BRICK_HEIGHT),
                         image,
-// TODO: adapt for different strategies
-//                        new BasicCollisionStrategy(this));
-//                        new PuckStrategy(this));
-//                        new ExtraPaddleStrategy(this));
-//                        new ExtraLifeCollisionStrategy(this));
-                        new ExplosiveCollisionStrategy(this, soundReader));
+                        strategyFactory.selectBrickStrategy());
                 gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
                 bricks[row][col] = brick;
             }
@@ -286,12 +284,15 @@ public class BrickerGameManager extends GameManager {
         gameObjects().removeGameObject(obj, Layer.STATIC_OBJECTS);
         if (isExplosive) {
             bricks[row][col] = null;
+            // TODO: remove diagonals
             for (int i = -1; i < 2; i++) {
                 for (int j = -1; j < 2; j++) {
                     int targetRow = row + i;
                     int targetCol = col + j;
                     if (targetRow >= 0 && targetRow < brickRows && targetCol >= 0 && targetCol < brickCols) {
                         if (bricks[targetRow][targetCol] != null) {
+                            activeBricks.decrement();
+                            gameObjects().removeGameObject(obj, Layer.STATIC_OBJECTS);
                             bricks[targetRow][targetCol].pseudoCollision();
                         }
                     }

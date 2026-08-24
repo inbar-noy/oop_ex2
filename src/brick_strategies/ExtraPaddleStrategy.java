@@ -15,6 +15,6 @@ public class ExtraPaddleStrategy extends BasicCollisionStrategy{
     @Override
     public void onCollision(Brick thisObj, GameObject otherObj) {
         super.onCollision(thisObj, otherObj);
-        gameManager.createExtraPaddle(thisObj.getCenter());
+        gameManager.createExtraPaddle();
     }
 }
