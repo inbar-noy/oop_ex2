@@ -29,7 +29,7 @@ public class BrickerGameManager extends GameManager {
     private static final float BRICK_HEIGHT = 15f;
     private static final float BRICK_MARGIN = 3f;
     private static final int DEFAULT_BRICK_COLS = 8;
-    private static final int DEFAULT_BRICK_ROWS = 1;
+    private static final int DEFAULT_BRICK_ROWS = 7;
     private static final int FIRST_BRICK_ROW_HEIGHT = 20;
     private static final int INITIAL_LIVES_COUNT = 3;
     private static final int HUD_LAYER = 1;
@@ -249,8 +249,8 @@ public class BrickerGameManager extends GameManager {
                         image,
 // TODO: adapt for different strategies
 //                        new BasicCollisionStrategy(this));
-//                        new PuckStrategy(this));
-                        new ExtraPaddleStrategy(this));
+                        new PuckStrategy(this));
+//                        new ExtraPaddleStrategy(this));
                 gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
             }
         }
