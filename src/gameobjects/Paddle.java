@@ -27,4 +27,6 @@ public abstract class Paddle extends GameObject {
             setTopLeftCorner(new Vector2(maxX, getTopLeftCorner().y()));
         }
     }
+
+    
 }

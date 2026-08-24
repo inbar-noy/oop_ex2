@@ -12,35 +12,25 @@ public class Border {
 
     private final Vector2 topLeftCorner = Vector2.ZERO;
     private final Vector2 topRightCorner;
-    private final Vector2 bottomLeftCorner;
-
-    private final Vector2 leftWallDims;
-    private final Vector2 topWallDims;
-    private final Vector2 rightWallDims;
-    private final Vector2 bottomWallDims;
+    private final Vector2 VerticalWallDims;
+    private final Vector2 HorizontalWallDims;
 
     private final RectangleRenderable border = new RectangleRenderable(BORDER_COLOR);
 
     public Border(Vector2 dimensions) {
         topRightCorner = new Vector2(dimensions.x() - BORDER_WIDTH, 0);
-        bottomLeftCorner = new Vector2(0, dimensions.y() - BORDER_WIDTH);
-
-        leftWallDims = new Vector2(BORDER_WIDTH, dimensions.y());
-        topWallDims = new Vector2(dimensions.x(), BORDER_WIDTH);
-        rightWallDims = new Vector2(BORDER_WIDTH, dimensions.y());
-        bottomWallDims = new Vector2(dimensions.x(), BORDER_WIDTH);
+        VerticalWallDims = new Vector2(BORDER_WIDTH, dimensions.y());
+        HorizontalWallDims = new Vector2(dimensions.x(), BORDER_WIDTH);
     }
 
     public Border buildBorder(GameObjectCollection gameObjects) {
-        Wall leftBorder = new Wall(topLeftCorner, leftWallDims, border);
-//        Wall topBorder = new Wall(topLeftCorner, topWallDims, border);
-        Wall rightBorder = new Wall(topRightCorner, rightWallDims, border);
-//        Wall bottomBorder = new Wall(bottomLeftCorner, bottomWallDims, border);
+        Wall leftBorder = new Wall(topLeftCorner, VerticalWallDims, border);
+        Wall rightBorder = new Wall(topRightCorner, VerticalWallDims, border);
+        Wall ceiling = new Wall(topLeftCorner, HorizontalWallDims, border);
 
         gameObjects.addGameObject(leftBorder);
-//        gameObjects.addGameObject(topBorder);
         gameObjects.addGameObject(rightBorder);
-//        gameObjects.addGameObject(bottomBorder);
+        gameObjects.addGameObject(ceiling);
 
         return this;
     }
