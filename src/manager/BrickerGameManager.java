@@ -1,10 +1,5 @@
 package manager;
 
-import brick_strategies.BasicCollisionStrategy;
-import brick_strategies.ExtraPaddleStrategy;
-import brick_strategies.PuckStrategy;
-import brick_strategies.ExplosiveCollisionStrategy;
-import brick_strategies.ExtraLifeCollisionStrategy;
 import danogl.GameManager;
 import danogl.GameObject;
 import danogl.collisions.Layer;
@@ -43,6 +38,7 @@ public class BrickerGameManager extends GameManager {
     private static final int HEART_X = 20;
     private static final int HEART_Y = 30;
     private static final int HEART_OFFSET = 25;
+    private static final int MAX_LIFE_COUNT = 4;
 
     private final int brickCols;
     private final int brickRows;
@@ -62,6 +58,7 @@ public class BrickerGameManager extends GameManager {
     private Brick[][] bricks;
     private BrickStrategyFactory strategyFactory;
     private UserPaddle userPaddle;
+    private Sound explosionSound;
 
     public BrickerGameManager(String windowTitle, Vector2 windowDimension, int brickCols, int brickRows) {
         super(windowTitle, windowDimension);
@@ -82,26 +79,15 @@ public class BrickerGameManager extends GameManager {
         this.windowDimensions = windowController.getWindowDimensions();
         this.inputListener = inputListener;
         this.livesLeft = 0;
-        this.strategyFactory = new BrickStrategyFactory(this, soundReader);
+        this.strategyFactory = new BrickStrategyFactory(this);
 
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
 
-        // Background
-        Background background = createBackground(imageReader, windowDimensions);
-
-        // gameobjects.Border
-        Border border = createBorder(windowDimensions);
-
-        // Main ball
+        createBackground(imageReader, windowDimensions);
+        createBorder(windowDimensions);
         respawn();
 
-        // User paddle
         userPaddle = createUserPaddle(imageReader, inputListener, windowDimensions);
-
-        // AI paddle
-//        AIPaddle aiPaddle = createAIPaddle(imageReader, windowDimensions, mainBall);
-
-        // Bricks
         bricks = new Brick[brickRows][brickCols];
         addBricks(imageReader, brickCols, brickRows);
 
@@ -120,19 +106,19 @@ public class BrickerGameManager extends GameManager {
         for (int i = 0; i < INITIAL_LIVES_COUNT; i++) {
             incrementHearts();
         }
+
+        explosionSound = soundReader.readSound("assets/explosion.wav");
     }
 
-    private Background createBackground(ImageReader imageReader, Vector2 windowDimensions) {
+    private void createBackground(ImageReader imageReader, Vector2 windowDimensions) {
         Renderable backgroundImage = imageReader.readImage("assets/DARK_BG2_small.jpeg", false);
         Background background = new Background(ZERO, windowDimensions, backgroundImage);
         gameObjects().addGameObject(background, Layer.BACKGROUND);
-        return background;
     }
 
-    private Border createBorder(Vector2 windowDimensions) {
+    private void createBorder(Vector2 windowDimensions) {
         Border border = new Border(windowDimensions);
         border.buildBorder(gameObjects());
-        return border;
     }
 
     private Ball createBall(ImageReader imageReader, SoundReader soundReader, Vector2 windowDimensions) {
@@ -147,14 +133,6 @@ public class BrickerGameManager extends GameManager {
                 imageReader, inputListener, windowDimensions, BORDER_WIDTH);
         gameObjects().addGameObject(userPaddle);
         return userPaddle;
-    }
-
-    private AIPaddle createAIPaddle(
-            ImageReader imageReader, Vector2 windowDimensions, GameObject objectToFollow) {
-        AIPaddle aiPaddle = PaddleFactory.createAIPaddle(
-                imageReader, windowDimensions, BORDER_WIDTH, objectToFollow);
-        gameObjects().addGameObject(aiPaddle);
-        return aiPaddle;
     }
 
     public void createPucks(Vector2 center) {
@@ -195,15 +173,6 @@ public class BrickerGameManager extends GameManager {
 
     @Override
     public void update(float timeDelta) {
-//        System.out.println(activeBricks.value());
-//        for (int i = 0; i < brickRows; i++) {
-//            for (int j = 0; j < brickCols; j++) {
-//                System.out.print(bricks[i][j] == null ? "1" : "0");
-//            }
-//
-//            System.out.println("");
-//
-//        }
         super.update(timeDelta);
 
         float ballHeight = ball.getCenter().y();
@@ -222,7 +191,7 @@ public class BrickerGameManager extends GameManager {
     }
 
     public void incrementHearts() {
-        if (livesLeft < 4) {
+        if (livesLeft < MAX_LIFE_COUNT) {
             livesLeft += 1;
             GameObject heart = new GameObject(
                     new Vector2(HEART_X + livesLeft * HEART_OFFSET, WINDOW_HEIGHT - HEART_Y),
@@ -259,7 +228,6 @@ public class BrickerGameManager extends GameManager {
         float brickWidth = (WINDOW_WIDTH - 2 * BORDER_WIDTH - BRICK_MARGIN) / columns - BRICK_MARGIN;
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
-
                 Brick brick = new Brick(
                         row,
                         col,
@@ -267,7 +235,8 @@ public class BrickerGameManager extends GameManager {
                                 (BRICK_HEIGHT + BRICK_MARGIN) * row + FIRST_BRICK_ROW_HEIGHT),
                         new Vector2(brickWidth, BRICK_HEIGHT),
                         image,
-                        strategyFactory.selectBrickStrategy());
+                        strategyFactory.selectBrickStrategy(),
+                        explosionSound);
                 gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
                 bricks[row][col] = brick;
             }
@@ -307,6 +276,7 @@ public class BrickerGameManager extends GameManager {
         activeBricks.decrement();
         bricks[row][col] = null;
         if (isExplosive) {
+            explosionSound.play();
             if (row > 0) {
                 blowBrick(row - 1, col);
             }

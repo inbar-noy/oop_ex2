@@ -7,11 +7,9 @@ import manager.BrickerGameManager;
 
 public class BrickStrategyFactory {
     private final BrickerGameManager gameManager;
-    private final SoundReader soundReader;
 
-    public BrickStrategyFactory(BrickerGameManager manager, SoundReader soundReader) {
+    public BrickStrategyFactory(BrickerGameManager manager) {
         this.gameManager = manager;
-        this.soundReader = soundReader;
     }
 
     public CollisionStrategy selectBrickStrategy() {
@@ -27,7 +25,7 @@ public class BrickStrategyFactory {
             return new PuckStrategy(gameManager);
         }
         else if (rand < 0.875) {
-            return new ExplosiveCollisionStrategy(gameManager, soundReader);
+            return new ExplosiveCollisionStrategy(gameManager);
         }
         else {
             return new ExtraLifeCollisionStrategy(gameManager);
