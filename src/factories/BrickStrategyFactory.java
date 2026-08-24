@@ -1,23 +1,20 @@
 package factories;
 
-import brick_strategies.BasicCollisionStrategy;
-import brick_strategies.CollisionStrategy;
-import brick_strategies.ExtraPaddleStrategy;
-import brick_strategies.PuckStrategy;
+import brick_strategies.*;
+import danogl.gui.SoundReader;
 import manager.BrickerGameManager;
 
 
 public class BrickStrategyFactory {
     private final BrickerGameManager gameManager;
-    private final double rand;
 
     public BrickStrategyFactory(BrickerGameManager manager) {
         this.gameManager = manager;
-        this.rand = Math.random();
     }
 
     public CollisionStrategy selectBrickStrategy() {
 
+        double rand = Math.random();
         if (rand < 0.5) {
             return new BasicCollisionStrategy(gameManager);
         }
@@ -28,10 +25,10 @@ public class BrickStrategyFactory {
             return new PuckStrategy(gameManager);
         }
         else if (rand < 0.875) {
-            return new BasicCollisionStrategy(gameManager);
+            return new ExplosiveCollisionStrategy(gameManager);
         }
         else {
-            return new BasicCollisionStrategy(gameManager);
+            return new ExtraLifeCollisionStrategy(gameManager);
         }
     }
 }

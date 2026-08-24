@@ -3,20 +3,47 @@ package gameobjects;
 import brick_strategies.CollisionStrategy;
 import danogl.GameObject;
 import danogl.collisions.Collision;
+import danogl.gui.Sound;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
 public class Brick extends GameObject {
     private final CollisionStrategy collisionStrategy;
+    private final Vector2 centerCoordinates;
+    private final Sound explosionSound;
 
-    public Brick(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable, CollisionStrategy collisionStrategy) {
+
+    private final int row;
+    private final int col;
+
+    public Brick(int row, int col, Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable, CollisionStrategy collisionStrategy, Sound explosionSound) {
         super(topLeftCorner, dimensions, renderable);
         this.collisionStrategy = collisionStrategy;
+        this.centerCoordinates = topLeftCorner.add(dimensions.mult(0.5f));
+        this.row = row;
+        this.col = col;
+        this.explosionSound = explosionSound;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
     }
 
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
         this.collisionStrategy.onCollision(this, other);
+    }
+
+    public Vector2 getCenterCoordinates() {
+        return this.centerCoordinates;
+    }
+
+    public void pseudoCollision() {
+        this.collisionStrategy.onCollision(this, null);
     }
 }
