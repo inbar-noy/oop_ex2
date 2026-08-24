@@ -209,15 +209,17 @@ public class BrickerGameManager extends GameManager {
     }
 
     public void incrementHearts() {
-        livesLeft += 1;
-        GameObject heart = new GameObject(
-                new Vector2(HEART_X + livesLeft * HEART_OFFSET, WINDOW_HEIGHT - HEART_Y),
-                new Vector2(HEART_SIZE, HEART_SIZE),
-                heartImage
-        );
-        gameObjects().addGameObject(heart, Layer.BACKGROUND);
-        hearts.add(heart);
-        updateLivesText();
+        if (livesLeft < 4) {
+            livesLeft += 1;
+            GameObject heart = new GameObject(
+                    new Vector2(HEART_X + livesLeft * HEART_OFFSET, WINDOW_HEIGHT - HEART_Y),
+                    new Vector2(HEART_SIZE, HEART_SIZE),
+                    heartImage
+            );
+            gameObjects().addGameObject(heart, Layer.BACKGROUND);
+            hearts.add(heart);
+            updateLivesText();
+        }
     }
 
     private void decrementHearts() {
@@ -254,13 +256,29 @@ public class BrickerGameManager extends GameManager {
                         image,
 // TODO: adapt for different strategies
 //                        new BasicCollisionStrategy(this));
-                        new PuckStrategy(this));
+//                        new PuckStrategy(this));
 //                        new ExtraPaddleStrategy(this));
+//                        new ExtraLifeCollisionStrategy(this));
+                        new ExplosiveCollisionStrategy(this, soundReader));
                 gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
                 bricks[row][col] = brick;
             }
         }
         activeBricks = new Counter(rows * columns);
+    }
+
+
+    public void startFallingHeart(Vector2 location) {
+        FallingHeart heart = new FallingHeart(location,
+                new Vector2(HEART_SIZE, HEART_SIZE),
+                heartImage,
+                this);
+        heart.setVelocity(new Vector2(0, 100));
+        gameObjects().addGameObject(heart);
+    }
+
+    public void removeHeart(FallingHeart heart) {
+        gameObjects().removeGameObject(heart);
     }
 
     public void removeBrick(GameObject obj, boolean isExplosive, int row, int col) {
