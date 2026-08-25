@@ -26,7 +26,6 @@ public class Ball extends GameObject {
                 Sound collisionSound) {
         super(topLeftCorner, dimensions, renderable);
         this.collisionSound = collisionSound;
-        this.setTag("ball");
     }
 
     /**

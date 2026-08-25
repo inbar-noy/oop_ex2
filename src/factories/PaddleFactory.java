@@ -64,27 +64,6 @@ public class PaddleFactory {
         return extra;
     }
 
-    /**
-     * Creates and initializes an AI-controlled paddle positioned near the top center
-     * of the game window that tracks a target GameObject.
-     * @param imageReader      ImageReader instance for loading the paddle image asset.
-     * @param windowDimensions Dimensions of the game window to calculate layout coordinates.
-     * @param borderWidth      Width of side borders to calculate movement boundaries.
-     * @param objectToFollow   Target GameObject (e.g. Ball) for the AI paddle to track.
-     * @return An initialized AIPaddle instance.
-     */
-    public static AIPaddle createAIPaddle(ImageReader imageReader,
-                                          Vector2 windowDimensions,
-                                          float borderWidth,
-                                          GameObject objectToFollow) {
-        Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
-        Vector2 topLeft = getInitialTopLeft(windowDimensions, DIST_FROM_BORDER);
-        float maxX = getMaxX(windowDimensions.x(), borderWidth);
-
-        return new AIPaddle(topLeft, PADDLE_DIMENSIONS, paddleImage,
-                borderWidth, maxX, objectToFollow);
-    }
-
     // Private helper functions
     private static Vector2 getInitialTopLeft(Vector2 windowDimensions, float yPos) {
         float xPos = (windowDimensions.x() - PADDLE_DIMENSIONS.x()) / 2f;
