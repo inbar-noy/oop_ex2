@@ -107,6 +107,7 @@ public class BrickerGameManager extends GameManager {
         this.windowDimensions = windowController.getWindowDimensions();
         this.inputListener = inputListener;
         this.livesLeft = 0;
+        this.extraPaddle = null;
 
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
 
@@ -145,6 +146,11 @@ public class BrickerGameManager extends GameManager {
                 respawn();
             }
         }
+
+        // update this.extraPaddle back to null if it has been removed from the game
+        if (extraPaddle != null && extraPaddle.hitQuota()) {
+            this.extraPaddle = null;
+        }
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -160,7 +166,7 @@ public class BrickerGameManager extends GameManager {
     /** Creates an Extra Paddle at the center of the screen. */
     public void createExtraPaddle() {
         if (this.extraPaddle != null) {
-            gameObjects().removeGameObject(this.extraPaddle);
+            return;
         }
         this.extraPaddle = PaddleFactory.createExtraPaddle(imageReader, inputListener,
                 windowDimensions, BORDER_WIDTH, gameObjects());

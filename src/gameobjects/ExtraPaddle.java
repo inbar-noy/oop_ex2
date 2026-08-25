@@ -47,13 +47,21 @@ public class ExtraPaddle extends UserPaddle {
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
 
-        // Increment counter for Ball/Puck collisions (ignore collisions with walls)
+        // Increment counter for Ball/Puck collisions (ignore collisions with walls).
+        // Remove paddle if quota has been met.
         if (other instanceof Ball) {
             this.numCollisions++;
-            if (this.numCollisions >= MAX_COLLISIONS) {
+            if (this.numCollisions == MAX_COLLISIONS) {
                 gameObjects.removeGameObject(this);
             }
         }
     }
 
+    /**
+     * Checks whether the extra paddle has reached its maximum collision quota.
+     * @return True if the collision quota has been reached, false otherwise.
+     */
+    public boolean hitQuota() {
+        return numCollisions == MAX_COLLISIONS;
+    }
 }
