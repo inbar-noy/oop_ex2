@@ -11,6 +11,10 @@ import gameobjects.Puck;
 
 import java.util.Random;
 
+/**
+ * Factory class responsible for initiating Ball and Puck game objects
+ * with their respective assets, dimensions, positions, and initial velocities.
+ */
 public class BallFactory {
     private static final Vector2 MAIN_BALL_DIMENSIONS = new Vector2(20, 20);
     private static final float PUCK_SIZE_RATIO = 0.75f;
@@ -23,7 +27,14 @@ public class BallFactory {
     private static final float BALL_SPEED = 200f;
     private static final Random random = new Random();
 
-
+    /**
+     * Initializes the main game ball positioned at the center of the window
+     * with a random initial diagonal velocity.
+     * @param imageReader      ImageReader instance for loading the ball image asset.
+     * @param soundReader      SoundReader instance for loading collision sound asset.
+     * @param windowDimensions Dimensions of the game window to calculate center placement.
+     * @return An initialized Ball instance.
+     */
     public static Ball createMainBall(ImageReader imageReader,
                                       SoundReader soundReader,
                                       Vector2 windowDimensions) {
@@ -37,7 +48,16 @@ public class BallFactory {
         return ball;
     }
 
-
+    /**
+     * initializes a Puck ball at the specified center position
+     * with a random initial velocity angle.
+     * @param imageReader    ImageReader instance for loading the puck image asset.
+     * @param soundReader    SoundReader instance for loading collision sound asset.
+     * @param centerPosition Coordinates where the puck should be centered.
+     * @param gameObjects    GameObjectCollection passed to the Puck for self-removal.
+     * @param windowHeight   Height of the game window used for out-of-bounds detection.
+     * @return An initialized Puck instance.
+     */
     public static Puck createPuck(ImageReader imageReader,
                                   SoundReader soundReader,
                                   Vector2 centerPosition,
@@ -50,6 +70,7 @@ public class BallFactory {
                 gameObjects, windowHeight);
         puck.setCenter(centerPosition);
 
+        // Calculate random initial velocity in upper unit circle
         double angle = random.nextDouble() * Math.PI;
         float velocityX = (float) Math.cos(angle) * BALL_SPEED;
         float velocityY = (float) Math.sin(angle) * BALL_SPEED;
