@@ -64,8 +64,7 @@ public class BrickGrid {
                         topLeftCorner,
                         new Vector2(brickWidth, BRICK_HEIGHT),
                         brickImage,
-                        strategyFactory.selectBrickStrategy(),
-                        explosionSound);
+                        strategyFactory.selectBrickStrategy());
                 manager.addStaticObj(brick);
                 bricks[row][col] = brick;
             }

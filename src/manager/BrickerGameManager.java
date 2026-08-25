@@ -6,15 +6,12 @@ import danogl.collisions.Layer;
 import danogl.gui.*;
 import danogl.gui.rendering.ImageRenderable;
 import danogl.gui.rendering.Renderable;
-import danogl.gui.rendering.TextRenderable;
 import danogl.util.Vector2;
 import factories.BallFactory;
 import factories.PaddleFactory;
 import gameobjects.*;
 
-import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 
 import static danogl.util.Vector2.ZERO;
 
@@ -34,19 +31,7 @@ public class BrickerGameManager extends GameManager {
     private static final float BORDER_WIDTH = Border.BORDER_WIDTH;
     private static final int DEFAULT_BRICK_COLS = 8;
     private static final int DEFAULT_BRICK_ROWS = 7;
-
-    // Lives and HUD constants
-    private static final int INITIAL_LIVES_COUNT = 3;
-    private static final int MAX_LIFE_COUNT = 4;
-    private static final int HEART_FALL_SPEED = 100;
-    private static final int HUD_LAYER = 1;
-    private static final int TEXT_FONT_SIZE = 20;
-    private static final int TEXT_X = 15;
-    private static final int TEXT_Y = 35;
     private static final int HEART_SIZE = 20;
-    private static final int HEART_X = 20;
-    private static final int HEART_Y = 30;
-    private static final int HEART_OFFSET = 25;
 
     // File paths
     private static final String BACKGROUND_IMAGE_PATH = "assets/DARK_BG2_small.jpeg";
@@ -70,12 +55,8 @@ public class BrickerGameManager extends GameManager {
     private UserPaddle userPaddle;
     private ExtraPaddle extraPaddle;
     private BrickGrid brickGrid;
-
-    // Lives and HUD state
-    private int livesLeft;
-    private ArrayList<GameObject> hearts;
+    private Lives lives;
     private ImageRenderable heartImage;
-    private TextRenderable livesLeftText;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                    CONSTRUCTORS
@@ -106,7 +87,6 @@ public class BrickerGameManager extends GameManager {
         this.windowController = windowController;
         this.windowDimensions = windowController.getWindowDimensions();
         this.inputListener = inputListener;
-        this.livesLeft = 0;
         this.extraPaddle = null;
 
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
@@ -122,8 +102,8 @@ public class BrickerGameManager extends GameManager {
                 WINDOW_WIDTH, BORDER_WIDTH, soundReader);
 
         // Setup HUD
-        createLiveText();
-        createHearts();
+        heartImage = imageReader.readImage(HEART_IMAGE_PATH, true);
+        lives = new Lives(HEART_SIZE, WINDOW_HEIGHT, heartImage, this);
     }
 
     @Override
@@ -139,8 +119,8 @@ public class BrickerGameManager extends GameManager {
 
         // Check Ball Out-Of-Bounds
         if (ballHeight > WINDOW_HEIGHT) {
-            decrementHearts();
-            if (isGameOver()) {
+            lives.decrementHearts();
+            if (lives.isGameOver()) {
                 gameOver("lose");
             } else {
                 respawn();
@@ -178,8 +158,8 @@ public class BrickerGameManager extends GameManager {
                 new Vector2(HEART_SIZE, HEART_SIZE),
                 heartImage,
                 this,
-                userPaddle);
-        heart.setVelocity(new Vector2(0, HEART_FALL_SPEED));
+                userPaddle,
+                WINDOW_HEIGHT);
         gameObjects().addGameObject(heart);
     }
 
@@ -188,19 +168,27 @@ public class BrickerGameManager extends GameManager {
         gameObjects().removeGameObject(heart);
     }
 
-    /** Increases player lives count and adds a heart icon if under MAX_LIFE_COUNT. */
+    /**
+     * Increment the number of lives the player has
+     */
     public void incrementHearts() {
-        if (livesLeft < MAX_LIFE_COUNT) {
-            livesLeft += 1;
-            GameObject heart = new GameObject(
-                    new Vector2(HEART_X + livesLeft * HEART_OFFSET, WINDOW_HEIGHT - HEART_Y),
-                    new Vector2(HEART_SIZE, HEART_SIZE),
-                    heartImage
-            );
-            gameObjects().addGameObject(heart, Layer.BACKGROUND);
-            hearts.add(heart);
-            updateLivesText();
-        }
+        this.lives.incrementHearts();
+    }
+
+    /**
+     * Remove a background object
+     * @param obj Object to remove
+     */
+    public void removeBackgroundObj(GameObject obj) {
+        gameObjects().removeGameObject(obj, Layer.BACKGROUND);
+    }
+
+    /**
+     * Add a background object
+     * @param obj Object to add
+     */
+    public void addBackgroundObj(GameObject obj) {
+        gameObjects().addGameObject(obj, Layer.BACKGROUND);
     }
 
     /** Removes a brick via BrickGrid. */
@@ -251,24 +239,6 @@ public class BrickerGameManager extends GameManager {
         return userPaddle;
     }
 
-    private void createLiveText() {
-        livesLeftText = new TextRenderable("");
-        GameObject text = new GameObject(
-                new Vector2(TEXT_X, WINDOW_HEIGHT - TEXT_Y),
-                new Vector2(TEXT_FONT_SIZE, TEXT_FONT_SIZE),
-                livesLeftText
-        );
-        gameObjects().addGameObject(text, HUD_LAYER);
-    }
-
-    private void createHearts() {
-        hearts = new ArrayList<>();
-        heartImage = imageReader.readImage(HEART_IMAGE_PATH, true);
-        for (int i = 0; i < INITIAL_LIVES_COUNT; i++) {
-            incrementHearts();
-        }
-    }
-
     // Game-state helpers
     private void respawn() {
         if (this.ball != null) {
@@ -277,34 +247,12 @@ public class BrickerGameManager extends GameManager {
         this.ball = createBall(imageReader, soundReader, windowDimensions);
     }
 
-    private boolean isGameOver() {
-        return this.livesLeft == 0;
-    }
-
     private void gameOver(String state) {
         String prompt = "You " + state + "! Another game?";
         if (this.windowController.openYesNoDialog(prompt)) {
             this.windowController.resetGame();
         } else {
             this.windowController.closeWindow();
-        }
-    }
-
-    private void decrementHearts() {
-        livesLeft -= 1;
-        GameObject heart = hearts.remove(hearts.size() - 1);
-        gameObjects().removeGameObject(heart, Layer.BACKGROUND);
-        updateLivesText();
-    }
-
-    private void updateLivesText() {
-        livesLeftText.setString(String.valueOf(livesLeft));
-        if (livesLeft == 1) {
-            livesLeftText.setColor(Color.red);
-        } else if (livesLeft == 2) {
-            livesLeftText.setColor(Color.yellow);
-        } else {
-            livesLeftText.setColor(Color.green);
         }
     }
 

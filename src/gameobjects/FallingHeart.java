@@ -12,6 +12,8 @@ import manager.BrickerGameManager;
 public class FallingHeart extends GameObject {
     private final BrickerGameManager manager;
     private final GameObject mainPaddle;
+    private final float windowHeight;
+    private static final int HEART_FALL_SPEED = 100;
 
     /**
      * Construct a falling heart
@@ -20,15 +22,19 @@ public class FallingHeart extends GameObject {
      * @param renderable Heart image
      * @param manager Parent game manager
      * @param mainPaddle Main paddle, the only object that can collide with a heart
+     * @param windowHeight Height of the window
      */
     public FallingHeart(Vector2 topLeftCorner,
                         Vector2 dimensions,
                         Renderable renderable,
                         BrickerGameManager manager,
-                        GameObject mainPaddle) {
+                        GameObject mainPaddle,
+                        float windowHeight) {
         super(topLeftCorner, dimensions, renderable);
         this.manager = manager;
         this.mainPaddle = mainPaddle;
+        this.windowHeight = windowHeight;
+        this.setVelocity(new Vector2(0, HEART_FALL_SPEED));
     }
 
     /**
@@ -51,5 +57,19 @@ public class FallingHeart extends GameObject {
         super.onCollisionEnter(other, collision);
         this.manager.incrementHearts();
         this.manager.removeHeart(this);
+    }
+
+    /**
+     * Update the falling heart
+     * @param deltaTime Time passed since last frame
+     */
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+
+        // Remove heart from game if it falls past the bottom window boundary
+        if (getTopLeftCorner().y() > windowHeight) {
+            this.manager.removeHeart(this);
+        }
     }
 }
