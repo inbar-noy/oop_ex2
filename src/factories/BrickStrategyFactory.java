@@ -29,7 +29,7 @@ public class BrickStrategyFactory {
 
         // 50% probability: BasicCollisionStrategy
         if (rand < 0.5) {
-            return new ExtraPaddleStrategy(gameManager);
+            return new BasicCollisionStrategy(gameManager);
         }
         // 12.5% probability: ExtraPaddleStrategy
         else if (rand < 0.625) {
