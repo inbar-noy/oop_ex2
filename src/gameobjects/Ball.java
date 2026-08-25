@@ -38,7 +38,6 @@ public class Ball extends GameObject {
      */
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
-        if (other.getTag().equals("heart")) return;
 
         super.onCollisionEnter(other, collision);
         Vector2 newVel = getVelocity().flipped(collision.getNormal());
