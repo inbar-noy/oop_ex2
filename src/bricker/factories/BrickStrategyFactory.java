@@ -1,7 +1,7 @@
-package factories;
+package bricker.factories;
 
-import brick_strategies.*;
-import manager.BrickerGameManager;
+import bricker.brick_strategies.*;
+import bricker.main.BrickerGameManager;
 
 /**
  * Factory class responsible for randomly selecting and instantiating

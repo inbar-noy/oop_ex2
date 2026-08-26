@@ -1,10 +1,10 @@
-package gameobjects;
+package bricker.gameobjects;
 
 import danogl.GameObject;
 import danogl.collisions.Collision;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-import manager.BrickerGameManager;
+import bricker.main.BrickerGameManager;
 
 /**
  * A class representing the +1 life heart
@@ -20,7 +20,7 @@ public class FallingHeart extends GameObject {
      * @param topLeftCorner Top left corner coordinate
      * @param dimensions Dimensions of heart
      * @param renderable Heart image
-     * @param manager Parent game manager
+     * @param manager Parent game Bricker.manager
      * @param mainPaddle Main paddle, the only object that can collide with a heart
      * @param windowHeight Height of the window
      */

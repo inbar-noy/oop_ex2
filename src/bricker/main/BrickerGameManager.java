@@ -1,4 +1,4 @@
-package manager;
+package bricker.main;
 
 import danogl.GameManager;
 import danogl.GameObject;
@@ -7,16 +7,16 @@ import danogl.gui.*;
 import danogl.gui.rendering.ImageRenderable;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-import factories.BallFactory;
-import factories.PaddleFactory;
-import gameobjects.*;
+import bricker.factories.BallFactory;
+import bricker.factories.PaddleFactory;
+import bricker.gameobjects.*;
 
 import java.awt.event.KeyEvent;
 
 import static danogl.util.Vector2.ZERO;
 
 /**
- * Main game manager for Bricker. Manages game initialization, the game loop,
+ * Main game Bricker.manager for Bricker. Manages game initialization, the game loop,
  * win/loss conditions, HUD/lives display, and callbacks for brick strategies.
  */
 public class BrickerGameManager extends GameManager {
@@ -62,6 +62,13 @@ public class BrickerGameManager extends GameManager {
     //                    CONSTRUCTORS
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    /**
+     * Construct a BrickerGameManager
+     * @param windowTitle Title of the window
+     * @param windowDimension Dimensions of the window
+     * @param brickCols Number of brick columns
+     * @param brickRows Number of brick rows
+     */
     public BrickerGameManager(String windowTitle, Vector2 windowDimension,
                               int brickCols, int brickRows) {
         super(windowTitle, windowDimension);
@@ -69,6 +76,11 @@ public class BrickerGameManager extends GameManager {
         this.brickRows = brickRows;
     }
 
+    /**
+     * Construct a BrickerGameManager with default brickCols, brickRows
+     * @param windowTitle Title of the window
+     * @param windowDimension Dimensions of the window
+     */
     public BrickerGameManager(String windowTitle, Vector2 windowDimension) {
         this(windowTitle, windowDimension, DEFAULT_BRICK_COLS, DEFAULT_BRICK_ROWS);
     }
@@ -244,7 +256,8 @@ public class BrickerGameManager extends GameManager {
 
     // Creators
     private void createBackground(ImageReader imageReader, Vector2 windowDimensions) {
-        Renderable backgroundImage = imageReader.readImage(BACKGROUND_IMAGE_PATH, false);
+        Renderable backgroundImage = imageReader.readImage(BACKGROUND_IMAGE_PATH,
+                false);
         Background background = new Background(ZERO, windowDimensions, backgroundImage);
         gameObjects().addGameObject(background, Layer.BACKGROUND);
     }

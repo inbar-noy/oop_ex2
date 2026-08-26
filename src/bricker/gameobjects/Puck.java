@@ -1,10 +1,9 @@
-package gameobjects;
+package bricker.gameobjects;
 
-import danogl.collisions.GameObjectCollection;
 import danogl.gui.Sound;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-import manager.BrickerGameManager;
+import bricker.main.BrickerGameManager;
 
 /**
  * Represents a Puck ball in the Bricker game.
@@ -20,7 +19,7 @@ public class Puck extends Ball {
      * @param dimensions     Width and height (diameter) of the puck.
      * @param renderable     Image of the puck.
      * @param collisionSound Sound effect to play upon collision.
-     * @param manager        Parent game manager.
+     * @param manager        Parent game Bricker.manager.
      * @param windowHeight   The height of the game window to detect when the puck falls offscreen.
      */
     public Puck(Vector2 topLeftCorner, Vector2 dimensions,

@@ -1,15 +1,12 @@
-package factories;
+package bricker.factories;
 
-import danogl.GameObject;
-import danogl.collisions.GameObjectCollection;
 import danogl.gui.ImageReader;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-import gameobjects.AIPaddle;
-import gameobjects.ExtraPaddle;
-import gameobjects.UserPaddle;
-import manager.BrickerGameManager;
+import bricker.gameobjects.ExtraPaddle;
+import bricker.gameobjects.UserPaddle;
+import bricker.main.BrickerGameManager;
 
 /**
  * Factory class responsible for initiating UserPaddle, ExtraPaddle, and AIPaddle
@@ -33,7 +30,8 @@ public class PaddleFactory {
                                               UserInputListener inputListener,
                                               Vector2 windowDimensions,
                                               float borderWidth) {
-        Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
+        Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH,
+                true);
         Vector2 topLeft = getInitialTopLeft(
                 windowDimensions, windowDimensions.y() - DIST_FROM_BORDER);
         float maxX = getMaxX(windowDimensions.x(), borderWidth);
@@ -48,7 +46,7 @@ public class PaddleFactory {
      * @param inputListener    UserInputListener to read user keyboard movement input.
      * @param windowDimensions Dimensions of the game window to calculate center placement.
      * @param borderWidth      Width of side borders to calculate movement boundaries.
-     * @param manager          Parent game manager
+     * @param manager          Parent game Bricker.manager
      * @return An initialized ExtraPaddle instance.
      */
     public static ExtraPaddle createExtraPaddle(ImageReader imageReader,
@@ -56,7 +54,8 @@ public class PaddleFactory {
                                                 Vector2 windowDimensions,
                                                 float borderWidth,
                                                 BrickerGameManager manager) {
-        Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
+        Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH,
+                true);
         float maxX = getMaxX(windowDimensions.x(), borderWidth);
 
         ExtraPaddle extra = new ExtraPaddle(Vector2.ZERO, PADDLE_DIMENSIONS, paddleImage,

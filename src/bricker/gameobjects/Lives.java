@@ -1,10 +1,10 @@
-package gameobjects;
+package bricker.gameobjects;
 
 import danogl.GameObject;
 import danogl.gui.rendering.ImageRenderable;
 import danogl.gui.rendering.TextRenderable;
 import danogl.util.Vector2;
-import manager.BrickerGameManager;
+import bricker.main.BrickerGameManager;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -35,9 +35,10 @@ public class Lives {
      * @param heartSize Size of the heart image (both X and Y)
      * @param windowHeight Height of the window
      * @param heartImage Image of the heart
-     * @param manager Parent game manager
+     * @param manager Parent game Bricker.manager
      */
-    public Lives(int heartSize, float windowHeight, ImageRenderable heartImage, BrickerGameManager manager) {
+    public Lives(int heartSize, float windowHeight,
+                 ImageRenderable heartImage, BrickerGameManager manager) {
         this.livesLeft = 0;
         this.heartSize = heartSize;
         this.windowHeight = windowHeight;

@@ -1,12 +1,11 @@
-package gameobjects;
+package bricker.gameobjects;
 
 import danogl.GameObject;
 import danogl.collisions.Collision;
-import danogl.collisions.GameObjectCollection;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-import manager.BrickerGameManager;
+import bricker.main.BrickerGameManager;
 
 /**
  * Represents an extra paddle in the Bricker game.
@@ -26,7 +25,7 @@ public class ExtraPaddle extends UserPaddle {
      * @param minX              Minimum allowed X-coordinate boundary.
      * @param maxX              Maximum allowed X-coordinate boundary.
      * @param inputListener     UserInputListener to read keyboard movement input.
-     * @param manager           Parent game manager
+     * @param manager           Parent game Bricker.manager
      */
     public ExtraPaddle(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable,
                        float minX, float maxX, UserInputListener inputListener,

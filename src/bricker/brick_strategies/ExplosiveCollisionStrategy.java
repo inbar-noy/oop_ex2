@@ -1,8 +1,8 @@
-package brick_strategies;
+package bricker.brick_strategies;
 
+import bricker.gameobjects.Brick;
+import bricker.main.BrickerGameManager;
 import danogl.GameObject;
-import gameobjects.Brick;
-import manager.BrickerGameManager;
 
 /**
  * A collision that blows up the brick and its surrounding bricks
@@ -13,7 +13,7 @@ public class ExplosiveCollisionStrategy implements CollisionStrategy {
 
     /**
      * Construct an explosive collision strategy
-     * @param manager Parent game manager
+     * @param manager Parent game Bricker.manager
      */
     public ExplosiveCollisionStrategy(BrickerGameManager manager) {
         this.manager = manager;
@@ -22,8 +22,9 @@ public class ExplosiveCollisionStrategy implements CollisionStrategy {
     /**
      * Blow up a brick
      * @param thisObj This (brick) object
+     * @param otherObj Unused
      */
-    public void onCollision(Brick thisObj) {
+    public void onCollision(Brick thisObj, GameObject otherObj) {
         manager.removeBrick(thisObj, true, thisObj.getRow(), thisObj.getCol());
     }
 }
