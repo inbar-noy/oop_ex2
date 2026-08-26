@@ -4,13 +4,14 @@ import danogl.collisions.GameObjectCollection;
 import danogl.gui.Sound;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
+import manager.BrickerGameManager;
 
 /**
  * Represents a Puck ball in the Bricker game.
  * Inherits ball behavior from Ball.
  */
 public class Puck extends Ball {
-    private final GameObjectCollection gameObjects;
+    private final BrickerGameManager manager;
     private final float windowHeight;
 
     /**
@@ -19,16 +20,16 @@ public class Puck extends Ball {
      * @param dimensions     Width and height (diameter) of the puck.
      * @param renderable     Image of the puck.
      * @param collisionSound Sound effect to play upon collision.
-     * @param gameObjects    GameObjectCollection used for self-removal when falling offscreen.
+     * @param manager        Parent game manager.
      * @param windowHeight   The height of the game window to detect when the puck falls offscreen.
      */
     public Puck(Vector2 topLeftCorner, Vector2 dimensions,
                 Renderable renderable, Sound collisionSound,
-                GameObjectCollection gameObjects, float windowHeight) {
+                BrickerGameManager manager, float windowHeight) {
         super(topLeftCorner, dimensions, renderable, collisionSound);
-        this.gameObjects = gameObjects;
+        this.manager = manager;
         this.windowHeight = windowHeight;
-        this.gameObjects.addGameObject(this);
+        this.manager.addPuck(this);
     }
 
     /**
@@ -42,7 +43,7 @@ public class Puck extends Ball {
 
         // Remove puck from game if it falls past the bottom window boundary
         if (getTopLeftCorner().y() > windowHeight) {
-            gameObjects.removeGameObject(this);
+            this.manager.removePuck(this);
         }
     }
 }

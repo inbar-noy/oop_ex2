@@ -9,6 +9,7 @@ import danogl.util.Vector2;
 import gameobjects.AIPaddle;
 import gameobjects.ExtraPaddle;
 import gameobjects.UserPaddle;
+import manager.BrickerGameManager;
 
 /**
  * Factory class responsible for initiating UserPaddle, ExtraPaddle, and AIPaddle
@@ -47,19 +48,19 @@ public class PaddleFactory {
      * @param inputListener    UserInputListener to read user keyboard movement input.
      * @param windowDimensions Dimensions of the game window to calculate center placement.
      * @param borderWidth      Width of side borders to calculate movement boundaries.
-     * @param gameObjects      GameObjectCollection passed to ExtraPaddle for self-management.
+     * @param manager          Parent game manager
      * @return An initialized ExtraPaddle instance.
      */
     public static ExtraPaddle createExtraPaddle(ImageReader imageReader,
                                                 UserInputListener inputListener,
                                                 Vector2 windowDimensions,
                                                 float borderWidth,
-                                                GameObjectCollection gameObjects) {
+                                                BrickerGameManager manager) {
         Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
         float maxX = getMaxX(windowDimensions.x(), borderWidth);
 
         ExtraPaddle extra = new ExtraPaddle(Vector2.ZERO, PADDLE_DIMENSIONS, paddleImage,
-                borderWidth, maxX, inputListener, gameObjects);
+                borderWidth, maxX, inputListener, manager);
         extra.setCenter(windowDimensions.mult(0.5f));
         return extra;
     }

@@ -57,7 +57,7 @@ public class Brick extends GameObject {
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
-        this.collisionStrategy.onCollision(this, other);
+        this.collisionStrategy.onCollision(this);
     }
 
     /**
@@ -73,6 +73,6 @@ public class Brick extends GameObject {
      * This happens when the brick is blown up by a neighbor brick.
      */
     public void pseudoCollision() {
-        this.collisionStrategy.onCollision(this, null);
+        this.collisionStrategy.onCollision(this);
     }
 }

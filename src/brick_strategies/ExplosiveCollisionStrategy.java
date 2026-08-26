@@ -22,9 +22,8 @@ public class ExplosiveCollisionStrategy implements CollisionStrategy {
     /**
      * Blow up a brick
      * @param thisObj This (brick) object
-     * @param otherObj Other object
      */
-    public void onCollision(Brick thisObj, GameObject otherObj) {
+    public void onCollision(Brick thisObj) {
         manager.removeBrick(thisObj, true, thisObj.getRow(), thisObj.getCol());
     }
 }

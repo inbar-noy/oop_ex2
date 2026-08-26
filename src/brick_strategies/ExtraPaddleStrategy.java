@@ -9,7 +9,7 @@ import manager.BrickerGameManager;
  * at the center of the game window upon brick destruction.
  * Inherits behavior from BasicCollisionStrategy.
  */
-public class ExtraPaddleStrategy extends BasicCollisionStrategy {
+public class ExtraPaddleStrategy implements CollisionStrategy {
     private final BrickerGameManager gameManager;
 
     /**
@@ -17,7 +17,6 @@ public class ExtraPaddleStrategy extends BasicCollisionStrategy {
      * @param manager Reference to the BrickerGameManager used to create the extra paddle.
      */
     public ExtraPaddleStrategy(BrickerGameManager manager) {
-        super(manager);
         this.gameManager = manager;
     }
 
@@ -25,11 +24,10 @@ public class ExtraPaddleStrategy extends BasicCollisionStrategy {
      * Handles the collision event between a ball or puck and a brick.
      * Removes the brick via BasicCollisionStrategy and triggers the creation of an extra paddle.
      * @param thisObj  The Brick object involved in the collision.
-     * @param otherObj The GameObject colliding with the brick.
      */
     @Override
-    public void onCollision(Brick thisObj, GameObject otherObj) {
-        super.onCollision(thisObj, otherObj);
+    public void onCollision(Brick thisObj) {
+        gameManager.removeBrick(thisObj, false, thisObj.getRow(), thisObj.getCol());
         gameManager.createExtraPaddle();
     }
 }
