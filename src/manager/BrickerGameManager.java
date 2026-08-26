@@ -201,18 +201,34 @@ public class BrickerGameManager extends GameManager {
         gameObjects().removeGameObject(obj, Layer.STATIC_OBJECTS);
     }
 
+    /**
+     * Add an extra paddle
+     * @param obj Paddle object
+     */
     public void addExtraPaddle(GameObject obj) {
         gameObjects().addGameObject(obj);
     }
 
+    /**
+     * Remove an extra paddle
+     * @param obj Paddle object
+     */
     public void removeExtraPaddle(GameObject obj) {
         gameObjects().removeGameObject(obj);
     }
 
+    /**
+     * Add a puck
+     * @param obj Puck object
+     */
     public void addPuck(GameObject obj) {
         gameObjects().addGameObject(obj);
     }
 
+    /**
+     * Remove a puck
+     * @param obj Puck object
+     */
     public void removePuck(GameObject obj) {
         gameObjects().removeGameObject(obj);
     }
