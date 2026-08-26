@@ -1,6 +1,6 @@
-package gameobjects;
+package bricker.gameobjects;
 
-import brick_strategies.CollisionStrategy;
+import bricker.brick_strategies.CollisionStrategy;
 import danogl.GameObject;
 import danogl.collisions.Collision;
 import danogl.gui.rendering.Renderable;
@@ -25,7 +25,8 @@ public class Brick extends GameObject {
      * @param brickImage Image of the brick
      * @param collisionStrategy Strategy to call when the brick is hit by a ball
      */
-    public Brick(int row, int col, Vector2 topLeftCorner, Vector2 dimensions, Renderable brickImage, CollisionStrategy collisionStrategy) {
+    public Brick(int row, int col, Vector2 topLeftCorner, Vector2 dimensions, Renderable brickImage,
+                 CollisionStrategy collisionStrategy) {
         super(topLeftCorner, dimensions, brickImage);
         this.collisionStrategy = collisionStrategy;
         this.centerCoordinates = topLeftCorner.add(dimensions.mult(0.5f));
@@ -57,7 +58,7 @@ public class Brick extends GameObject {
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
-        this.collisionStrategy.onCollision(this);
+        this.collisionStrategy.onCollision(this, null);
     }
 
     /**
@@ -73,6 +74,6 @@ public class Brick extends GameObject {
      * This happens when the brick is blown up by a neighbor brick.
      */
     public void pseudoCollision() {
-        this.collisionStrategy.onCollision(this);
+        this.collisionStrategy.onCollision(this, null);
     }
 }

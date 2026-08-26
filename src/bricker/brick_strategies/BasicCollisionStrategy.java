@@ -1,8 +1,8 @@
-package brick_strategies;
+package bricker.brick_strategies;
 
+import bricker.gameobjects.Brick;
+import bricker.main.BrickerGameManager;
 import danogl.GameObject;
-import gameobjects.Brick;
-import manager.BrickerGameManager;
 
 /**
  * Collision strategy that simply removes the brick.
@@ -12,7 +12,7 @@ public class BasicCollisionStrategy implements CollisionStrategy {
 
     /**
      * Construct a basic collision strategy
-     * @param manager Parent game manager
+     * @param manager Parent game Bricker.manager
      */
     public BasicCollisionStrategy(BrickerGameManager manager) {
         this.manager = manager;
@@ -21,8 +21,9 @@ public class BasicCollisionStrategy implements CollisionStrategy {
     /**
      * Remove the brick
      * @param thisObj This (brick) object
+     * @param otherObj Unused
      */
-    public void onCollision(Brick thisObj) {
+    public void onCollision(Brick thisObj, GameObject otherObj) {
         manager.removeBrick(thisObj, false, thisObj.getRow(), thisObj.getCol());
     }
 }

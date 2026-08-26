@@ -1,14 +1,13 @@
-package factories;
+package bricker.factories;
 
-import danogl.collisions.GameObjectCollection;
 import danogl.gui.ImageReader;
 import danogl.gui.Sound;
 import danogl.gui.SoundReader;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-import gameobjects.Ball;
-import gameobjects.Puck;
-import manager.BrickerGameManager;
+import bricker.gameobjects.Ball;
+import bricker.gameobjects.Puck;
+import bricker.main.BrickerGameManager;
 
 import java.util.Random;
 
@@ -55,7 +54,7 @@ public class BallFactory {
      * @param imageReader    ImageReader instance for loading the puck image asset.
      * @param soundReader    SoundReader instance for loading collision sound asset.
      * @param centerPosition Coordinates where the puck should be centered.
-     * @param manager        Parent game manager.
+     * @param manager        Parent game Bricker.manager.
      * @param windowHeight   Height of the game window used for out-of-bounds detection.
      * @return An initialized Puck instance.
      */

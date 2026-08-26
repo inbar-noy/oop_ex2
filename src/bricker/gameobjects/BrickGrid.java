@@ -1,4 +1,4 @@
-package gameobjects;
+package bricker.gameobjects;
 
 import danogl.GameObject;
 import danogl.gui.ImageReader;
@@ -7,8 +7,8 @@ import danogl.gui.SoundReader;
 import danogl.gui.rendering.ImageRenderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
-import factories.BrickStrategyFactory;
-import manager.BrickerGameManager;
+import bricker.factories.BrickStrategyFactory;
+import bricker.main.BrickerGameManager;
 
 /**
  * A grid of bricks
@@ -28,7 +28,7 @@ public class BrickGrid {
 
     /**
      * Construct a grid of bricks
-     * @param manager Parent game manager
+     * @param manager Parent game Bricker.manager
      * @param imageReader Game image reader to read brick image with
      * @param columns Number of brick columns
      * @param rows Number of brick rows
@@ -44,7 +44,8 @@ public class BrickGrid {
                      float borderWidth,
                      SoundReader soundReader) {
         this.manager = manager;
-        ImageRenderable brickImage = imageReader.readImage(BRICK_IMAGE_FILE, false);
+        ImageRenderable brickImage = imageReader.readImage(BRICK_IMAGE_FILE,
+                false);
         explosionSound = soundReader.readSound(EXPLOSION_SOUND_FILE);
         brickCols = columns;
         brickRows = rows;
