@@ -8,6 +8,7 @@ import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 import gameobjects.Ball;
 import gameobjects.Puck;
+import manager.BrickerGameManager;
 
 import java.util.Random;
 
@@ -54,20 +55,20 @@ public class BallFactory {
      * @param imageReader    ImageReader instance for loading the puck image asset.
      * @param soundReader    SoundReader instance for loading collision sound asset.
      * @param centerPosition Coordinates where the puck should be centered.
-     * @param gameObjects    GameObjectCollection passed to the Puck for self-removal.
+     * @param manager        Parent game manager.
      * @param windowHeight   Height of the game window used for out-of-bounds detection.
      * @return An initialized Puck instance.
      */
     public static Puck createPuck(ImageReader imageReader,
                                   SoundReader soundReader,
                                   Vector2 centerPosition,
-                                  GameObjectCollection gameObjects,
+                                  BrickerGameManager manager,
                                   float windowHeight) {
         Renderable puckImage = imageReader.readImage(PUCK_IMAGE_PATH, true);
         Sound collisionSound = soundReader.readSound(COLLISION_SOUND_PATH);
 
         Puck puck = new Puck(Vector2.ZERO, PUCK_DIMENSIONS, puckImage, collisionSound,
-                gameObjects, windowHeight);
+                manager, windowHeight);
         puck.setCenter(centerPosition);
 
         // Calculate random initial velocity in upper unit circle

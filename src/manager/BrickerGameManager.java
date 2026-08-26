@@ -139,8 +139,8 @@ public class BrickerGameManager extends GameManager {
 
     /** Creates 2 Puck balls at the specified center location. */
     public void createPucks(Vector2 center) {
-        BallFactory.createPuck(imageReader, soundReader, center, gameObjects(), WINDOW_HEIGHT);
-        BallFactory.createPuck(imageReader, soundReader, center, gameObjects(), WINDOW_HEIGHT);
+        BallFactory.createPuck(imageReader, soundReader, center, this, WINDOW_HEIGHT);
+        BallFactory.createPuck(imageReader, soundReader, center, this, WINDOW_HEIGHT);
     }
 
     /** Creates an Extra Paddle at the center of the screen. */
@@ -149,7 +149,7 @@ public class BrickerGameManager extends GameManager {
             return;
         }
         this.extraPaddle = PaddleFactory.createExtraPaddle(imageReader, inputListener,
-                windowDimensions, BORDER_WIDTH, gameObjects());
+                windowDimensions, BORDER_WIDTH, this);
     }
 
     /** Creates a falling heart at the specified location. */
@@ -199,6 +199,22 @@ public class BrickerGameManager extends GameManager {
     /** Removes a static object from Layer.STATIC_OBJECTS. */
     public void removeStaticObj(GameObject obj) {
         gameObjects().removeGameObject(obj, Layer.STATIC_OBJECTS);
+    }
+
+    public void addExtraPaddle(GameObject obj) {
+        gameObjects().addGameObject(obj);
+    }
+
+    public void removeExtraPaddle(GameObject obj) {
+        gameObjects().removeGameObject(obj);
+    }
+
+    public void addPuck(GameObject obj) {
+        gameObjects().addGameObject(obj);
+    }
+
+    public void removePuck(GameObject obj) {
+        gameObjects().removeGameObject(obj);
     }
 
     /** Adds a static object to Layer.STATIC_OBJECTS. */

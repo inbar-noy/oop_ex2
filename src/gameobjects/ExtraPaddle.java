@@ -6,6 +6,7 @@ import danogl.collisions.GameObjectCollection;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
+import manager.BrickerGameManager;
 
 /**
  * Represents an extra paddle in the Bricker game.
@@ -14,7 +15,7 @@ import danogl.util.Vector2;
  */
 public class ExtraPaddle extends UserPaddle {
     private static final int MAX_COLLISIONS = 4;
-    private final GameObjectCollection gameObjects;
+    private final BrickerGameManager manager;
     private int numCollisions;
 
     /**
@@ -25,15 +26,15 @@ public class ExtraPaddle extends UserPaddle {
      * @param minX              Minimum allowed X-coordinate boundary.
      * @param maxX              Maximum allowed X-coordinate boundary.
      * @param inputListener     UserInputListener to read keyboard movement input.
-     * @param gameObjects       GameObjectCollection used for self-addition and self-removal.
+     * @param manager           Parent game manager
      */
     public ExtraPaddle(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable,
                        float minX, float maxX, UserInputListener inputListener,
-                       GameObjectCollection gameObjects) {
+                       BrickerGameManager manager) {
         super(topLeftCorner, dimensions, renderable, minX, maxX, inputListener);
-        this.gameObjects = gameObjects;
+        this.manager = manager;
         this.numCollisions = 0;
-        this.gameObjects.addGameObject(this);
+        this.manager.addExtraPaddle(this);
     }
 
     /**
@@ -52,7 +53,7 @@ public class ExtraPaddle extends UserPaddle {
         if (other instanceof Ball) {
             this.numCollisions++;
             if (this.numCollisions == MAX_COLLISIONS) {
-                gameObjects.removeGameObject(this);
+                this.manager.removeExtraPaddle(this);
             }
         }
     }

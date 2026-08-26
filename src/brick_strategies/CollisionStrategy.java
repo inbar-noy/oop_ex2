@@ -10,7 +10,6 @@ public interface CollisionStrategy {
     /**
      * Method to call when something collides with a brick.
      * @param thisObj This (brick) object
-     * @param otherObj Other object
      */
-    void onCollision(Brick thisObj, GameObject otherObj);
+    void onCollision(Brick thisObj);
 }
