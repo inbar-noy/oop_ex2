@@ -12,6 +12,7 @@ import java.util.Random;
  * Represents a ball in the Bricker game.
  */
 public class Ball extends GameObject {
+    public static final String BALL_TAG = "Ball";
     private static final Random random = new Random();
     private final Sound collisionSound;
 
@@ -26,6 +27,7 @@ public class Ball extends GameObject {
                 Sound collisionSound) {
         super(topLeftCorner, dimensions, renderable);
         this.collisionSound = collisionSound;
+        this.setTag(BALL_TAG);
     }
 
     /**

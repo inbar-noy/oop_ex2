@@ -47,9 +47,9 @@ public class ExtraPaddle extends UserPaddle {
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
 
-        // Increment counter for Ball/Puck collisions (ignore collisions with walls).
+        // Increment counter for Ball/Puck collisions.
         // Remove paddle if quota has been met.
-        if (other instanceof Ball) {
+        if (other.getTag().equals(Ball.BALL_TAG)) {
             this.numCollisions++;
             if (this.numCollisions == MAX_COLLISIONS) {
                 this.manager.removeExtraPaddle(this);

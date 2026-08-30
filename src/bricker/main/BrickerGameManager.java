@@ -227,6 +227,7 @@ public class BrickerGameManager extends GameManager {
      */
     public void removeExtraPaddle(GameObject obj) {
         gameObjects().removeGameObject(obj);
+        this.extraPaddle = null;
     }
 
     /**
