@@ -1,0 +1,173 @@
+inbar_neuwirth, yonsch
+214775264, 208258285
+
+By giving the constructors of the collision strategies the game’s manager, we are
+giving the strategies access to all the public methods of the game manager. This
+breaks encapsulation, by giving the strategies access to more functionality than it
+actually needs. Also, this way the collision strategy is bound to the specific game (a
+BrickerGameManager class), and can’t be reused in other projects.
+
+We wrote a class called “Lives” to manage the lives of the player, counting the lives
+in a single game. This separates the actual counting (increment/decrement) of the
+lives, from its representation. The lives are incremented/decremented through a strict
+API (incrementHearts, decrementHearts), which makes sure that the two representations
+are updated correctly alongside the actual counter.
+
+======================================================================================
+A. Roles of Added Classes and Interfaces
+======================================================================================
+
+Package brick_strategies:
+-------------------------
+* ExplosiveCollisionStrategy: Strategy that removes the brick and triggers a chain
+  reaction explosion on neighboring bricks.
+* ExtraLifeCollisionStrategy: Strategy that removes the brick and creates a falling
+  heart object (FallingHeart).
+* ExtraPaddleStrategy: Strategy that removes the brick and triggers the creation of
+  an extra paddle at the center of the screen.
+* PuckStrategy: Strategy that removes the brick and triggers the creation of two Puck
+  balls at the center of the latest removed brick.
+
+Package factories:
+------------------
+* BrickStrategyFactory: Factory class that randomly assigns a collision strategy to
+  each brick according to the specified probability distribution.
+* BallFactory: Factory for instantiating the main game ball (Ball) and puck balls
+  (Puck) with their required properties (size, texture, center position, and initial
+  velocity).
+* PaddleFactory: Factory for instantiating the user-controlled main paddle
+  (UserPaddle) and extra paddle (ExtraPaddle).
+
+Package gameobjects:
+--------------------
+* Paddle (Abstract Class): Base class for paddles enforcing screen boundary
+  restrictions (minX, maxX).
+* UserPaddle: Extends Paddle. Main paddle controlled by the player using the left and
+  right arrow keys.
+* ExtraPaddle: Secondary paddle created at the center of the screen that automatically
+  removes itself after 4 ball collisions.
+* Puck: Secondary ball (scaled to 75% size of the main ball) that removes itself when
+  falling past the bottom screen boundary.
+* Brick: Represents a single brick in the game, triggers its strategy upon collision,
+  and tracks its row/column position.
+* BrickGrid: Manages the 2D matrix of bricks, tracks active brick count, and handles
+  explosive chain reactions.
+* FallingHeart: Heart object that falls vertically, collides strictly with the main
+  paddle, and restores a life.
+* Lives: Encapsulates and displays the player's life count (both numeric text and
+  graphical heart icons).
+* Wall: A wall object to enable the ball and paddle to collide with it.
+* Border: Constructs the side walls.
+* Background: Background layer.
+
+======================================================================================
+B. Player Lives Implementation and Future Extensions
+======================================================================================
+
+Implementation:
+---------------
+The Lives class centrally encapsulates the player's life state:
+* Graphical Display: Maintains a list of heart GameObjects added to/removed from
+  Layer.BACKGROUND.
+* Numeric Display: Uses a TextRenderable object displaying the numerical count and
+  dynamically updating its color (green for 3+, yellow for 2, red for 1).
+* Logic: Provides incrementHearts() and decrementHearts() methods to update the life
+  counter (capped at a maximum of 4 lives) and UI representations simultaneously.
+
+Extensibility for Future Life-Dependent Components:
+---------------------------------------------------
+The Lives class exposes a clean public API (isGameOver(), incrementHearts(),
+decrementHearts()). Game logic coordination is managed through BrickerGameManager. Any
+future component dependent on lives (e.g., audio triggers, extra UI widgets, or loss
+indicators) can query or interact with this API without modifying the internal
+graphical representation or internal logic of the Lives class (adhering to the
+Open-Closed Principle).
+
+======================================================================================
+Implementation of Special Behaviors and Associated Classes
+======================================================================================
+
+Extra Balls (Puck Balls):
+-------------------------
+* Implementation: On colliding with a brick configured with PuckStrategy,
+  createPucks() is called on BrickerGameManager. The manager invokes
+  BallFactory.createPuck() to instantiate two Puck balls at the center position of the
+  broken brick.
+* Classes Added:
+  - PuckStrategy: Strategy class triggering puck creation.
+  - Puck: Subclass of Ball. Overrides update() to check if the puck's Y position
+    exceeds the window height (WINDOW_HEIGHT). If out of bounds, it removes itself
+    from gameObjects.
+  - BallFactory: Initializes pucks at 75% size of the main ball with random initial
+    velocities directed in the upper semicircle.
+
+Extra Paddle:
+-------------
+* Implementation: Upon colliding with a brick configured with ExtraPaddleStrategy,
+  createExtraPaddle() is called on BrickerGameManager. The manager checks if an extra
+  paddle is already active (if (this.extraPaddle != null) return;). If not, a new
+  extra paddle is created at the center of the screen.
+* Classes Added:
+  - ExtraPaddleStrategy: Strategy class triggering extra paddle creation.
+  - ExtraPaddle: Subclass of UserPaddle. Maintains a collision counter
+    (numCollisions). Inside onCollisionEnter(), it increments the counter whenever
+    colliding with a Ball (including Puck). Upon reaching 4 collisions, it removes
+    itself from the game (gameObjects.removeGameObject(this)).
+  - PaddleFactory: Instantiates the extra paddle centered in the game window.
+
+Explosive Brick:
+----------------
+* Implementation: Upon colliding with a brick configured with
+  ExplosiveCollisionStrategy, removeBrick() is called on BrickerGameManager with
+  isExplosive = true.
+* Classes Added/Modified:
+  - ExplosiveCollisionStrategy: Strategy defining explosive brick behavior.
+  - BrickGrid: Manages the 2D brick array. When an explosive brick is removed, it plays
+    an explosion sound effect (explosion.wav) and triggers pseudoCollision() on
+    neighbor bricks in the grid: [i-1, j], [i+1, j], [i, j-1], and [i, j+1].
+  - Brick: Added pseudoCollision() method to trigger neighbor strategies without
+    requiring a physical ball collision (enabling chain explosions).
+
+Extra Life (Falling Heart):
+---------------------------
+* Implementation: Upon breaking a brick configured with ExtraLifeCollisionStrategy,
+  startFallingHeart() is called on BrickerGameManager. A heart object is created at the
+  destroyed brick's center position and falls downward.
+* Classes Added:
+  - ExtraLifeCollisionStrategy: Strategy class creating the falling heart.
+  - FallingHeart: Subclass of GameObject.
+    * Movement: Moves downward at a constant vertical speed of 100.
+    * Collision Filtering: Overrides shouldCollideWith(GameObject other) to return true
+      only if the colliding object is the main paddle (userPaddle).
+    * Collision Handling: On collision with the main paddle, calls
+      manager.incrementHearts() (restoring a life up to max 4) and removes itself. If
+      it falls past the bottom screen boundary without colliding, it removes itself
+      automatically.
+
+======================================================================================
+API Extensions
+======================================================================================
+
+1. Extensions to the Brick API:
+-------------------------------
+* Added getCenterCoordinates(): Some behaviors (such as creating Puck balls or
+  FallingHeart objects) require instantiating new game objects at the exact center
+  location of the destroyed brick.
+* Added pseudoCollision(): Necessary for the Explosive Brick behavior. When an
+  explosive brick goes KABOOM, it needs to trigger the destruction of neighboring
+  bricks in the BrickGrid without requiring a physical ball collision event or mocking
+  fake Collision objects. pseudoCollision() allows neighboring bricks to execute their
+  assigned collision strategies cleanly.
+* Added getRow() and getCol(): Explicit accessors for row and column indices required
+  by BrickGrid to locate adjacent neighbors during explosive chain reactions.
+
+2. Extensions to the BrickerGameManager API:
+-------------------------------------------
+* Added Object Creators & Game State Methods (createPucks, createExtraPaddle,
+  startFallingHeart, incrementHearts): Strategies (CollisionStrategy) execute during
+  brick destruction. Extending BrickerGameManager provided a clean bridge for
+  strategies to request game-level object additions and state modifications.
+* Added Layer Management Helpers (addBackgroundObj, removeBackgroundObj, addStaticObj,
+  removeStaticObj): Required for objects like Lives (heart icons in the background
+  layer) and FallingHeart / ExtraPaddle to manage their lifecycle and layer placement
+  through the manager cleanly.

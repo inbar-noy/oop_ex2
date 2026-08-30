@@ -1,0 +1,34 @@
+package bricker.brick_strategies;
+
+import bricker.gameobjects.Brick;
+import bricker.main.BrickerGameManager;
+import danogl.GameObject;
+
+/**
+ * Brick collision strategy that triggers the creation of two Puck balls
+ * at the center of a destroyed brick.
+ * Inherits behavior from BasicCollisionStrategy.
+ */
+public class PuckStrategy implements CollisionStrategy {
+    private final BrickerGameManager gameManager;
+
+    /**
+     * Constructs a new PuckStrategy instance.
+     * @param manager Reference to the BrickerGameManager used to create pucks.
+     */
+    public PuckStrategy(BrickerGameManager manager) {
+        this.gameManager = manager;
+    }
+
+    /**
+     * Handles the collision event between a ball and a brick.
+     * Removes the brick via BasicCollisionStrategy and triggers the creation of two pucks.
+     * @param thisObj  The Brick object involved in the collision.
+     * @param otherObj Unused
+     */
+    @Override
+    public void onCollision(Brick thisObj, GameObject otherObj) {
+        gameManager.removeBrick(thisObj, false, thisObj.getRow(), thisObj.getCol());
+        gameManager.createPucks(thisObj.getCenter());
+    }
+}

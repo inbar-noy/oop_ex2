@@ -1,0 +1,34 @@
+package bricker.brick_strategies;
+
+import bricker.gameobjects.Brick;
+import bricker.main.BrickerGameManager;
+import danogl.GameObject;
+
+/**
+ * Brick collision strategy that triggers the creation of an ExtraPaddle
+ * at the center of the game window upon brick destruction.
+ * Inherits behavior from BasicCollisionStrategy.
+ */
+public class ExtraPaddleStrategy implements CollisionStrategy {
+    private final BrickerGameManager gameManager;
+
+    /**
+     * Constructs a new ExtraPaddleStrategy instance.
+     * @param manager Reference to the BrickerGameManager used to create the extra paddle.
+     */
+    public ExtraPaddleStrategy(BrickerGameManager manager) {
+        this.gameManager = manager;
+    }
+
+    /**
+     * Handles the collision event between a ball or puck and a brick.
+     * Removes the brick via BasicCollisionStrategy and triggers the creation of an extra paddle.
+     * @param thisObj  The Brick object involved in the collision.
+     * @param otherObj Unused
+     */
+    @Override
+    public void onCollision(Brick thisObj, GameObject otherObj) {
+        gameManager.removeBrick(thisObj, false, thisObj.getRow(), thisObj.getCol());
+        gameManager.createExtraPaddle();
+    }
+}
